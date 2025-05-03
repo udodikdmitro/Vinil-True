@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vinylshop
+    username: your_user
+    password: your_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  mail:
+    host: smtp-relay.brevo.com
+    port: 587
+    username: your_brevo_user
+    password: your_brevo_api_key
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
