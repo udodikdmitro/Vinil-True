@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +52,17 @@ public class VinylService {
         } catch (IOException e) {
             throw new RuntimeException("Помилка імпорту", e);
         }
+    }
+
+    public Optional<VinylDto> findById(Long id) {
+        return vinylRepository.findById(id)
+                .map(entity -> new VinylDto(
+                    entity.getId(),
+                    entity.getTitle(),
+                    entity.getArtist(),
+                    entity.getYear(),
+                    entity.getImage()
+                ));
     }
 }
 

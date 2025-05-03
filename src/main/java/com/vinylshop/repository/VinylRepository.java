@@ -12,5 +12,5 @@ import java.util.Collection;
  */
 @Repository
 public interface VinylRepository extends JpaRepository<Vinyl, Long> {
-    Collection<Object> findTop10ByOrderByYearDesc();
+    Collection<Vinyl> findTop10ByOrderByYearDesc();
 }

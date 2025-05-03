@@ -22,8 +22,10 @@ public class VinylController {
         return vinylService.findTop10ForMainPage();
     }
 
-    @GetMapping
-    public VinylDto getVinyl(@RequestParam("id") String id) {}
+    @GetMapping("/{id}")
+    public ResponseEntity<VinylDto> getVinyl(@PathVariable("id") Long id) {
+        return ResponseEntity.of(vinylService.findById(id));
+    }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
