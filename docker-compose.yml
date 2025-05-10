@@ -4,6 +4,7 @@ services:
   postgres:
     image: postgres:15
     container_name: vinyl-db
+    restart: always
     environment:
       POSTGRES_DB: vinylstore
       POSTGRES_USER: postgres
