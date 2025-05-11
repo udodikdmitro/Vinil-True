@@ -3,6 +3,7 @@ package com.vinylshop.service;
 import com.vinylshop.dto.VinylDto;
 import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Vinyl;
+import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.repository.VinylRepository;
 import com.vinylshop.upload.UploadedFileAdapter;
 import jakarta.transaction.Transactional;
@@ -16,9 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static java.util.function.Predicate.isEqual;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +47,28 @@ public class VinylService {
         return vinylRepository.save(vinyl);
     }
 
+    @Transactional
+    public List<FileMetadata> addImages(Long id, List<UploadedFileAdapter> files) {
+        Vinyl vinyl = vinylRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("vinil not found"));
+        vinyl.getImages().addAll(fileService.createFiles(files));
+        vinyl = vinylRepository.save(vinyl);
+        return vinyl.getImages();
+    }
+
+    @Transactional
+    public List<FileMetadata> removeImages(Long id, List<Long> fileIds) {
+        Vinyl vinyl = vinylRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("vinil not found"));
+
+        vinyl.getImages().removeIf(x -> fileIds.contains(x.getId()));
+
+        fileService.deleteFiles(fileIds);
+
+        vinyl = vinylRepository.save(vinyl);
+        return vinyl.getImages();
+    }
+
     public void importFromExcel(MultipartFile file) {
         try (InputStream is = file.getInputStream(); Workbook workbook = new XSSFWorkbook(is)) {
             Sheet sheet = workbook.getSheetAt(0);
@@ -60,9 +85,8 @@ public class VinylService {
         }
     }
 
-    public Optional<VinylDto> findById(Long id) {
-        return vinylRepository.findById(id)
-                .map(this::toDto);
+    public Optional<Vinyl> findById(Long id) {
+        return vinylRepository.findById(id);
     }
 
     public VinylDto toDto(Vinyl entity) {

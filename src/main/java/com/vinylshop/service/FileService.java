@@ -71,6 +71,11 @@ public class FileService {
         return metadataRepository.findById(id);
     }
 
+    @Transactional
+    public void deleteFiles(List<Long> ids) {
+        metadataRepository.deleteAllByIdInBatch(ids);
+    }
+
     public FileMetadataDto toDto(FileMetadata entity) {
         return new FileMetadataDto(
                 entity.getId(),
