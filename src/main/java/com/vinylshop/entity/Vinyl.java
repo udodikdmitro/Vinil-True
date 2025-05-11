@@ -2,7 +2,13 @@
 package com.vinylshop.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Сутність, яка представляє вінілову платівку
@@ -27,8 +33,16 @@ public class Vinyl {
     /** Рік випуску */
     private int year;
 
-    /** Зображення платівки у форматі byte[] */
-    @Lob
-    @Column(columnDefinition = "bytea")
-    private byte[] image;
+    @OneToMany(
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinTable(
+            name = "vinil_images",
+            joinColumns = @JoinColumn(name = "vinil_id"),
+            inverseJoinColumns = @JoinColumn(name = "file_metadata_id")
+    )
+    private List<FileMetadata> images = new ArrayList<>();
+
 }

@@ -9,6 +9,10 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
+    properties:
+      hibernate.jdbc.batch_size: 50
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
   mail:
     host: smtp-relay.brevo.com
     port: 587
@@ -17,3 +21,7 @@ spring:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+
+api:
+  file-metadata:
+    endpoint: '/api/v1/files/{id}'

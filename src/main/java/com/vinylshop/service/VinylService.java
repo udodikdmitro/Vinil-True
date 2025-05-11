@@ -1,8 +1,11 @@
 package com.vinylshop.service;
 
 import com.vinylshop.dto.VinylDto;
+import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Vinyl;
 import com.vinylshop.repository.VinylRepository;
+import com.vinylshop.upload.UploadedFileAdapter;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -13,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,21 +25,23 @@ import java.util.Optional;
 public class VinylService {
 
     private final VinylRepository vinylRepository;
+    private final FileService fileService;
 
     public List<VinylDto> findTop10ForMainPage() {
         return vinylRepository.findTop10ByOrderByYearDesc().stream()
-                .map(v -> new VinylDto(v.getId(), v.getTitle(), v.getArtist(), v.getYear(), v.getImage()))
+                .map(this::toDto)
                 .toList();
     }
 
-    public VinylDto save(VinylDto dto) {
-        Vinyl vinyl = new Vinyl();
-        vinyl.setTitle(dto.getTitle());
-        vinyl.setArtist(dto.getArtist());
-        vinyl.setYear(dto.getYear());
-        vinyl.setImage(dto.getImage());
-        Vinyl saved = vinylRepository.save(vinyl);
-        return new VinylDto(saved.getId(), saved.getTitle(), saved.getArtist(), saved.getYear(), saved.getImage());
+    @Transactional
+    public Vinyl create(Vinyl vinyl, Collection<UploadedFileAdapter> images) {
+        vinyl.setImages(fileService.createFiles(images));
+        return create(vinyl);
+    }
+
+    @Transactional
+    public Vinyl create(Vinyl vinyl) {
+        return vinylRepository.save(vinyl);
     }
 
     public void importFromExcel(MultipartFile file) {
@@ -56,13 +62,21 @@ public class VinylService {
 
     public Optional<VinylDto> findById(Long id) {
         return vinylRepository.findById(id)
-                .map(entity -> new VinylDto(
-                    entity.getId(),
-                    entity.getTitle(),
-                    entity.getArtist(),
-                    entity.getYear(),
-                    entity.getImage()
-                ));
+                .map(this::toDto);
     }
+
+    public VinylDto toDto(Vinyl entity) {
+        return new VinylDto(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getArtist(),
+                entity.getYear(),
+                entity.getImages()
+                        .stream()
+                        .map(FileMetadata::getContentUrl)
+                        .toList()
+        );
+    }
+
 }
 

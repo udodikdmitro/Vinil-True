@@ -2,6 +2,8 @@ package com.vinylshop.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @Getter
 @Setter
@@ -12,6 +14,6 @@ public class VinylDto {
     private String title;
     private String artist;
     private Integer year;
-    private byte[] image;
+    private List<String> imageUrls;
 }
 
