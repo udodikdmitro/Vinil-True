@@ -1,11 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/vinylshop
+    url: jdbc:postgresql://localhost:5432/vinylstore
     username: your_user
     password: your_password
+  flyway:
+    enabled: true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
   mail:
     host: smtp-relay.brevo.com

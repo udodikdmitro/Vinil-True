@@ -10,13 +10,20 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(
+        name = "refresh_tokens",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uq_refresh_token_user_id", columnNames = "user_id"),
+                @UniqueConstraint(name = "uq_refresh_token_token", columnNames = "token")
+        }
+)
 public class RefreshToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String token;
 
     private Instant expiryDate;

@@ -10,7 +10,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "users")
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uq_users_email", columnNames = "email")
+        }
+)
 public class User {
 
     @Id
@@ -24,6 +29,7 @@ public class User {
     private String fullName;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", foreignKey = @ForeignKey(name = "fk_user_roles_users_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 }
