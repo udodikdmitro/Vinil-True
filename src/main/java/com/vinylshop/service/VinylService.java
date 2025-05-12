@@ -1,10 +1,12 @@
 package com.vinylshop.service;
 
+import com.vinylshop.dto.FileMetadataDto;
 import com.vinylshop.dto.VinylDto;
 import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Vinyl;
 import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.repository.VinylRepository;
+import com.vinylshop.upload.MultipartFileUploadedFileAdapter;
 import com.vinylshop.upload.SsPictureDataUploadedFileAdapter;
 import com.vinylshop.upload.UploadedFileAdapter;
 import jakarta.transaction.Transactional;
@@ -15,9 +17,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.*;
 
 @Service
@@ -34,21 +38,45 @@ public class VinylService {
     }
 
     @Transactional
-    public Vinyl create(Vinyl vinyl, Collection<UploadedFileAdapter> images) {
-        vinyl.setImages(fileService.createFiles(images));
-        return create(vinyl);
+    public VinylDto saveFromDto(VinylDto dto, Collection<MultipartFile> files) {
+        Vinyl vinyl = new Vinyl();
+        vinyl.setTitle(dto.getTitle());
+        vinyl.setArtist(dto.getArtist());
+        vinyl.setYear(dto.getYear());
+
+        if (files != null && !files.isEmpty()) {
+            vinyl.setImages(fileService.saveFilesFromMultipartFiles(files));
+        }
+
+        vinyl = vinylRepository.save(vinyl);
+
+        return toDto(vinyl);
     }
 
     @Transactional
-    public Vinyl create(Vinyl vinyl) {
+    public Vinyl save(Vinyl vinyl, Collection<UploadedFileAdapter> images) {
+        vinyl.setImages(fileService.saveFilesFromUploadedFileAdapters(images));
         return vinylRepository.save(vinyl);
     }
 
     @Transactional
-    public List<FileMetadata> addImages(Long id, List<UploadedFileAdapter> files) {
+    public List<FileMetadataDto> addImagesFromMultipartFiles(Long id, List<MultipartFile> files) {
         Vinyl vinyl = vinylRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("vinil not found"));
-        vinyl.getImages().addAll(fileService.createFiles(files));
+
+        vinyl.getImages().addAll(fileService.saveFilesFromMultipartFiles(files));
+        vinyl = vinylRepository.save(vinyl);
+
+        return vinyl.getImages().stream()
+                .map(fileService::toDto)
+                .toList();
+    }
+
+    @Transactional
+    public List<FileMetadata> addImagesFromUploadedFileAdapters(Long id, List<UploadedFileAdapter> files) {
+        Vinyl vinyl = vinylRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("vinil not found"));
+        vinyl.getImages().addAll(fileService.saveFilesFromUploadedFileAdapters(files));
         vinyl = vinylRepository.save(vinyl);
         return vinyl.getImages();
     }
@@ -79,7 +107,7 @@ public class VinylService {
                 vinyl.setYear((int) row.getCell(2).getNumericCellValue());
 
                 List<UploadedFileAdapter> images = imageMap.getOrDefault(row.getRowNum(), Collections.emptyList());
-                create(vinyl, images);
+                save(vinyl, images);
             }
         } catch (IOException e) {
             throw new RuntimeException("Помилка імпорту", e);

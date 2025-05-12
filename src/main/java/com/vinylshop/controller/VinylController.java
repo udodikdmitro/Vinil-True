@@ -2,12 +2,9 @@ package com.vinylshop.controller;
 
 import com.vinylshop.dto.FileMetadataDto;
 import com.vinylshop.dto.VinylDto;
-import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Vinyl;
 import com.vinylshop.service.FileService;
 import com.vinylshop.service.VinylService;
-import com.vinylshop.upload.MultipartFileUploadedFileAdapter;
-import com.vinylshop.upload.UploadedFileAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,25 +50,9 @@ public class VinylController {
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             UriComponentsBuilder uriBuilder
     ) {
-        if (images == null) {
-            images = Collections.emptyList();
-        }
-
-        List<UploadedFileAdapter> uploadedFileAdapters = images.stream()
-                .map(image -> (UploadedFileAdapter) new MultipartFileUploadedFileAdapter(image))
-                .toList();
-
-        Vinyl vinyl = new Vinyl();
-        vinyl.setTitle(dto.getTitle());
-        vinyl.setArtist(dto.getArtist());
-        vinyl.setYear(dto.getYear());
-
-        vinyl = vinylService.create(vinyl, uploadedFileAdapters);
-
-        dto.setId(vinyl.getId());
-        URI uri = uriBuilder.path("/api/vinyls/{id}").build(vinyl.getId());
-        return ResponseEntity.created(uri)
-                .body(vinylService.toDto(vinyl));
+        VinylDto savedVinylDto = vinylService.saveFromDto(dto, images);
+        URI uri = uriBuilder.path("/api/vinyls/{id}").build(savedVinylDto.getId());
+        return ResponseEntity.created(uri).body(savedVinylDto);
     }
 
     @PostMapping(value = "/{id}/images/add", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
@@ -83,16 +63,7 @@ public class VinylController {
         if (images == null || images.isEmpty()) {
             return getAllImages(id);
         }
-
-        List<UploadedFileAdapter> uploadedFileAdapters = images.stream()
-                .map(image -> (UploadedFileAdapter) new MultipartFileUploadedFileAdapter(image))
-                .toList();
-
-        List<FileMetadata> metadatas = vinylService.addImages(id, uploadedFileAdapters);
-
-        return ResponseEntity.ok(metadatas.stream()
-                .map(fileService::toDto)
-                .toList());
+        return ResponseEntity.ok(vinylService.addImagesFromMultipartFiles(id, images));
     }
 
     @PostMapping(value = "/{id}/images/delete")
