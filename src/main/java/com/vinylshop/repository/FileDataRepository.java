@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface FileDataRepository extends JpaRepository<FileData, UUID> {
+public interface FileDataRepository extends JpaRepository<FileData, Long> {
 
 }
