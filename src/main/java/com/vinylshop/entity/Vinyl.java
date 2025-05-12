@@ -39,9 +39,9 @@ public class Vinyl {
             orphanRemoval = true
     )
     @JoinTable(
-            name = "vinil_images",
-            joinColumns = @JoinColumn(name = "vinil_id"),
-            inverseJoinColumns = @JoinColumn(name = "file_metadata_id")
+            name = "files_references",
+            joinColumns = @JoinColumn(name = "vinyl_id", foreignKey = @ForeignKey(name = "fk_files_references_vinyl")),
+            inverseJoinColumns = @JoinColumn(name = "file_metadata_id", foreignKey = @ForeignKey(name = "fk_files_references_file_metadatas"))
     )
     private List<FileMetadata> images = new ArrayList<>();
 
