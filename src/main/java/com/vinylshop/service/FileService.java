@@ -14,10 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +27,10 @@ public class FileService {
 
     @Transactional
     public List<FileMetadata> createFiles(Collection<UploadedFileAdapter> files) {
+        if (files == null || files.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         UriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(fileMetadataEndpoint);
 
