@@ -2,10 +2,7 @@
 package com.vinylshop.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,23 +11,20 @@ import java.util.List;
  * Сутність, яка представляє вінілову платівку
  */
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Vinyl {
+public class Vinyl extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    /** Назва платівки */
+    @Column(nullable = false)
     private String title;
 
-    /** Ім'я виконавця */
+    @Column(nullable = false)
     private String artist;
 
-    /** Рік випуску */
+    @Column(nullable = false)
     private int year;
 
     @OneToMany(

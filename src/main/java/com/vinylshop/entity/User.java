@@ -6,7 +6,8 @@ import lombok.*;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -16,14 +17,12 @@ import java.util.Set;
                 @UniqueConstraint(name = "uq_users_email", columnNames = "email")
         }
 )
-public class User {
+public class User extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
     private String fullName;
@@ -32,4 +31,5 @@ public class User {
     @CollectionTable(name = "user_roles", foreignKey = @ForeignKey(name = "fk_user_roles_users_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
+
 }

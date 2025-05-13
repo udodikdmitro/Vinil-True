@@ -10,18 +10,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "file_metadatas")
-public class FileMetadata {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
-    private Long id;
+public class FileMetadata extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
@@ -51,11 +46,5 @@ public class FileMetadata {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "file_data_id", foreignKey = @ForeignKey(name = "fk_file_metadatas_file_data"))
     private FileData fileData;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
 }

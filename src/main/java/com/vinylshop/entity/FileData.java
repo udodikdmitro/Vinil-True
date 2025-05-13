@@ -4,18 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "file_data")
-public class FileData {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
-    private Long id;
+public class FileData extends BaseEntity {
 
     @Column(name = "bytes", columnDefinition = "bytea not null")
     private byte[] bytes;

@@ -1,6 +1,8 @@
 create table file_data (
     id bigserial not null,
     bytes bytea not null,
+    created_at timestamp(6) default CURRENT_TIMESTAMP,
+    updated_at timestamp(6) default CURRENT_TIMESTAMP,
     constraint pk_file_data_id primary key (id)
 );
 

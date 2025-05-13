@@ -6,7 +6,8 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -17,11 +18,7 @@ import java.time.Instant;
                 @UniqueConstraint(name = "uq_refresh_token_token", columnNames = "token")
         }
 )
-public class RefreshToken {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class RefreshToken extends BaseEntity {
 
     @Column(unique = true, nullable = false)
     private String token;
@@ -31,4 +28,5 @@ public class RefreshToken {
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
 }
