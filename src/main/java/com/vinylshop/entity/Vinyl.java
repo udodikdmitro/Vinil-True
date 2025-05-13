@@ -4,31 +4,39 @@ package com.vinylshop.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Сутність, яка представляє вінілову платівку
  */
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Vinyl {
+public class Vinyl extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    /** Назва платівки */
+    @Column(nullable = false)
     private String title;
 
-    /** Ім'я виконавця */
+    @Column(nullable = false)
     private String artist;
 
-    /** Рік випуску */
+    @Column(nullable = false)
     private int year;
 
-    /** Зображення платівки у форматі byte[] */
-    @Lob
-    @Column(columnDefinition = "bytea")
-    private byte[] image;
+    @OneToMany(
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinTable(
+            name = "files_references",
+            joinColumns = @JoinColumn(name = "vinyl_id", foreignKey = @ForeignKey(name = "fk_files_references_vinyl")),
+            inverseJoinColumns = @JoinColumn(name = "file_metadata_id", foreignKey = @ForeignKey(name = "fk_files_references_file_metadatas"))
+    )
+    private List<FileMetadata> images = new ArrayList<>();
+
 }

@@ -6,17 +6,21 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RefreshToken {
+@Table(
+        name = "refresh_tokens",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uq_refresh_token_user_id", columnNames = "user_id"),
+                @UniqueConstraint(name = "uq_refresh_token_token", columnNames = "token")
+        }
+)
+public class RefreshToken extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String token;
 
     private Instant expiryDate;
@@ -24,4 +28,5 @@ public class RefreshToken {
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
 }
