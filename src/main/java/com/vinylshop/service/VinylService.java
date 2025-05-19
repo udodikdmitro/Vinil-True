@@ -6,6 +6,7 @@ import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Vinyl;
 import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.mapper.FileMetadataMapper;
+import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.repository.VinylRepository;
 import com.vinylshop.upload.SsPictureDataUploadedFileAdapter;
 import com.vinylshop.upload.UploadedFileAdapter;
@@ -28,20 +29,17 @@ public class VinylService {
 
     private final VinylRepository vinylRepository;
     private final FileService fileService;
+    private final VinylMapper vinylMapper;
     private final FileMetadataMapper fileMetadataMapper;
 
     public List<VinylDto> findTop10ForMainPage() {
-        return vinylRepository.findTop10ByOrderByYearDesc().stream()
-                .map(this::toDto)
+        return vinylMapper.toDtoAll(vinylRepository.findTop10ByOrderByYearDesc())
                 .toList();
     }
 
     @Transactional
     public VinylDto saveFromDto(VinylDto dto, Collection<MultipartFile> files) {
-        Vinyl vinyl = new Vinyl();
-        vinyl.setTitle(dto.getTitle());
-        vinyl.setArtist(dto.getArtist());
-        vinyl.setYear(dto.getYear());
+        Vinyl vinyl = vinylMapper.toEntity(dto);
 
         if (files != null && !files.isEmpty()) {
             vinyl.setImages(fileService.saveFilesFromMultipartFiles(files));
@@ -49,7 +47,7 @@ public class VinylService {
 
         vinyl = vinylRepository.save(vinyl);
 
-        return toDto(vinyl);
+        return vinylMapper.toDto(vinyl);
     }
 
     @Transactional
@@ -139,19 +137,6 @@ public class VinylService {
 
     public Optional<Vinyl> findById(Long id) {
         return vinylRepository.findById(id);
-    }
-
-    public VinylDto toDto(Vinyl entity) {
-        return new VinylDto(
-                entity.getId(),
-                entity.getTitle(),
-                entity.getArtist(),
-                entity.getYear(),
-                entity.getImages()
-                        .stream()
-                        .map(FileMetadata::getContentUrl)
-                        .toList()
-        );
     }
 
 }
