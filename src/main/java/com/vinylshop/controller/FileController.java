@@ -3,6 +3,7 @@ package com.vinylshop.controller;
 import com.vinylshop.dto.FileMetadataDto;
 import com.vinylshop.entity.FileData;
 import com.vinylshop.entity.FileMetadata;
+import com.vinylshop.mapper.FileMetadataMapper;
 import com.vinylshop.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -23,10 +24,12 @@ import java.util.Optional;
 public class FileController {
 
     private final FileService fileService;
+    private final FileMetadataMapper fileMetadataMapper;
 
     @GetMapping("/{id}")
     private ResponseEntity<FileMetadataDto> getFileById(@PathVariable Long id) {
-        return ResponseEntity.of(fileService.getMetadataById(id).map(fileService::toDto));
+        return ResponseEntity.of(fileService.getMetadataById(id)
+                .map(fileMetadataMapper::toDto));
     }
 
     @GetMapping("/{id}/content")

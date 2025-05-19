@@ -1,8 +1,8 @@
 package com.vinylshop.service;
 
-import com.vinylshop.dto.FileMetadataDto;
 import com.vinylshop.entity.FileData;
 import com.vinylshop.entity.FileMetadata;
+import com.vinylshop.mapper.FileMetadataMapper;
 import com.vinylshop.repository.FileMetadataRepository;
 import com.vinylshop.upload.MultipartFileUploadedFileAdapter;
 import com.vinylshop.upload.UploadedFileAdapter;
@@ -23,6 +23,7 @@ import java.util.*;
 public class FileService {
 
     private final FileMetadataRepository metadataRepository;
+    private final FileMetadataMapper fileMetadataMapper;
 
     @Value("${api.file-metadata.endpoint}")
     private String fileMetadataEndpoint;
@@ -56,18 +57,10 @@ public class FileService {
 
         for(UploadedFileAdapter file : uploadedFileAdapters) {
             try {
-                FileData fileData = FileData.builder()
-                        .bytes(file.getBytes())
-                        .build();
+                FileData fileData = new FileData(file.getBytes(), null);
 
-                FileMetadata fileMetadata = FileMetadata.builder()
-                        .name(file.getName())
-                        .originalName(file.getOriginalFilename())
-                        .description(file.getOriginalFilename())
-                        .contentType(file.getContentType())
-                        .size(file.getSize())
-                        .fileData(fileData)
-                        .build();
+                FileMetadata fileMetadata = fileMetadataMapper.toEntity(file);
+                fileMetadata.setFileData(fileData);
 
                 metadatas.add(fileMetadata);
             } catch (IOException e) {
@@ -93,21 +86,6 @@ public class FileService {
     @Transactional
     public void deleteFiles(List<Long> ids) {
         metadataRepository.deleteAllByIdInBatch(ids);
-    }
-
-    public FileMetadataDto toDto(FileMetadata entity) {
-        return new FileMetadataDto(
-                entity.getId(),
-                entity.getName(),
-                entity.getOriginalName(),
-                entity.getDescription(),
-                entity.getContentType(),
-                entity.getUrl(),
-                entity.getContentUrl(),
-                entity.getSize(),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt()
-        );
     }
 
 }

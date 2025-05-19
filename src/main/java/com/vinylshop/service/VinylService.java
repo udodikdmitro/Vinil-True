@@ -5,8 +5,8 @@ import com.vinylshop.dto.VinylDto;
 import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Vinyl;
 import com.vinylshop.exception.ResourceNotFoundException;
+import com.vinylshop.mapper.FileMetadataMapper;
 import com.vinylshop.repository.VinylRepository;
-import com.vinylshop.upload.MultipartFileUploadedFileAdapter;
 import com.vinylshop.upload.SsPictureDataUploadedFileAdapter;
 import com.vinylshop.upload.UploadedFileAdapter;
 import jakarta.transaction.Transactional;
@@ -17,11 +17,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.*;
 
 @Service
@@ -30,6 +28,7 @@ public class VinylService {
 
     private final VinylRepository vinylRepository;
     private final FileService fileService;
+    private final FileMetadataMapper fileMetadataMapper;
 
     public List<VinylDto> findTop10ForMainPage() {
         return vinylRepository.findTop10ByOrderByYearDesc().stream()
@@ -67,9 +66,7 @@ public class VinylService {
         vinyl.getImages().addAll(fileService.saveFilesFromMultipartFiles(files));
         vinyl = vinylRepository.save(vinyl);
 
-        return vinyl.getImages().stream()
-                .map(fileService::toDto)
-                .toList();
+        return fileMetadataMapper.toDtoAll(vinyl.getImages()).toList();
     }
 
     @Transactional
