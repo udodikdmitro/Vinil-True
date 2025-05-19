@@ -179,6 +179,7 @@
 
                     <compilerArgs>
                         <arg>-Amapstruct.defaultComponentModel=spring</arg>
+                        <arg>-implicit:class</arg>
                     </compilerArgs>
 
                     <annotationProcessorPaths>
