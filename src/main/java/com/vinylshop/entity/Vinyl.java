@@ -37,6 +37,7 @@ public class Vinyl extends BaseEntity {
             joinColumns = @JoinColumn(name = "vinyl_id", foreignKey = @ForeignKey(name = "fk_files_references_vinyl")),
             inverseJoinColumns = @JoinColumn(name = "file_metadata_id", foreignKey = @ForeignKey(name = "fk_files_references_file_metadatas"))
     )
+    @Builder.Default
     private List<FileMetadata> images = new ArrayList<>();
 
 }
