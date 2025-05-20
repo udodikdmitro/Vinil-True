@@ -3,7 +3,8 @@ package com.vinylshop.controller;
 import com.vinylshop.dto.FileMetadataDto;
 import com.vinylshop.dto.VinylDto;
 import com.vinylshop.entity.Vinyl;
-import com.vinylshop.service.FileService;
+import com.vinylshop.mapper.FileMetadataMapper;
+import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.service.VinylService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -23,7 +24,8 @@ import java.util.Optional;
 public class VinylController {
 
     private final VinylService vinylService;
-    private final FileService fileService;
+    private final VinylMapper vinylMapper;
+    private final FileMetadataMapper fileMetadataMapper;
 
     @GetMapping
     public List<VinylDto> getAll() {
@@ -32,15 +34,14 @@ public class VinylController {
 
     @GetMapping("/{id}")
     public ResponseEntity<VinylDto> getVinyl(@PathVariable("id") Long id) {
-        return ResponseEntity.of(vinylService.findById(id).map(vinylService::toDto));
+        return ResponseEntity.of(vinylService.findById(id).map(vinylMapper::toDto));
     }
 
     @GetMapping("/{id}/images")
     public ResponseEntity<List<FileMetadataDto>> getAllImages(@PathVariable Long id) {
         Optional<Vinyl> metadata = vinylService.findById(id);
-        return ResponseEntity.of(metadata.map(x -> x.getImages()
-                .stream()
-                .map(fileService::toDto)
+        return ResponseEntity.of(metadata.map(x -> fileMetadataMapper
+                .toDtoAll(x.getImages())
                 .toList()));
     }
 

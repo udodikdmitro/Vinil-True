@@ -6,6 +6,7 @@ import com.vinylshop.dto.RegisterRequest;
 import com.vinylshop.entity.RefreshToken;
 import com.vinylshop.entity.Role;
 import com.vinylshop.entity.User;
+import com.vinylshop.mapper.UserMapper;
 import com.vinylshop.repository.RefreshTokenRepository;
 import com.vinylshop.repository.UserRepository;
 import com.vinylshop.security.JwtTokenProvider;
@@ -27,17 +28,16 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtProvider;
+    private final UserMapper userMapper;
 
     public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Користувач з такою поштою вже існує");
         }
-        User user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .fullName(request.getFullName())
-                .roles(Set.of(Role.USER))
-                .build();
+        User user = userMapper.toEntity(request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRoles(Set.of(Role.USER));
+
         userRepository.save(user);
     }
 
