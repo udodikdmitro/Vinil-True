@@ -10,13 +10,13 @@ import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.repository.VinylRepository;
 import com.vinylshop.upload.SsPictureDataUploadedFileAdapter;
 import com.vinylshop.upload.UploadedFileAdapter;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ooxml.POIXMLDocumentPart;
 import org.apache.poi.ss.usermodel.PictureData;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class VinylService {
     @Transactional
     public List<FileMetadataDto> addImagesFromMultipartFiles(Long id, List<MultipartFile> files) {
         Vinyl vinyl = vinylRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("vinil not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
 
         vinyl.getImages().addAll(fileService.saveFilesFromMultipartFiles(files));
         vinyl = vinylRepository.save(vinyl);
@@ -70,7 +70,7 @@ public class VinylService {
     @Transactional
     public List<FileMetadata> addImagesFromUploadedFileAdapters(Long id, List<UploadedFileAdapter> files) {
         Vinyl vinyl = vinylRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("vinil not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
         vinyl.getImages().addAll(fileService.saveFilesFromUploadedFileAdapters(files));
         vinyl = vinylRepository.save(vinyl);
         return vinyl.getImages();
@@ -79,7 +79,7 @@ public class VinylService {
     @Transactional
     public List<FileMetadata> removeImages(Long id, List<Long> fileIds) {
         Vinyl vinyl = vinylRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("vinil not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
 
         vinyl.getImages().removeIf(x -> fileIds.contains(x.getId()));
 
@@ -89,6 +89,7 @@ public class VinylService {
         return vinyl.getImages();
     }
 
+    @Transactional
     public void importFromExcel(MultipartFile file) {
         try (InputStream is = file.getInputStream(); XSSFWorkbook workbook = new XSSFWorkbook(is)) {
             XSSFSheet sheet = workbook.getSheetAt(0);
