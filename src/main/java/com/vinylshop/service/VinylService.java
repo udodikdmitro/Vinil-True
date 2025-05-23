@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -101,6 +102,9 @@ public class VinylService {
                 vinyl.setTitle(row.getCell(0).getStringCellValue());
                 vinyl.setArtist(row.getCell(1).getStringCellValue());
                 vinyl.setYear((int) row.getCell(2).getNumericCellValue());
+                vinyl.setPrice(BigDecimal.valueOf(row.getCell(3).getNumericCellValue()));
+                vinyl.setCurrency(Currency.getInstance(row.getCell(4).getStringCellValue()));
+                vinyl.setYear((int) row.getCell(5).getNumericCellValue());
 
                 List<UploadedFileAdapter> images = imageMap.getOrDefault(row.getRowNum(), Collections.emptyList());
                 save(vinyl, images);

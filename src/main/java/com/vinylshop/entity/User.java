@@ -3,6 +3,7 @@ package com.vinylshop.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Currency;
 import java.util.Set;
 
 @Entity
@@ -31,5 +32,8 @@ public class User extends BaseEntity {
     @CollectionTable(name = "user_roles", foreignKey = @ForeignKey(name = "fk_user_roles_users_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
+
+    @Column(nullable = false)
+    private Currency currency;
 
 }

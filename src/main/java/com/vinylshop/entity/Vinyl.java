@@ -4,7 +4,9 @@ package com.vinylshop.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 
 /**
@@ -39,5 +41,22 @@ public class Vinyl extends BaseEntity {
     )
     @Builder.Default
     private List<FileMetadata> images = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "vinyl",
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    private List<CartItem> cartItems = new ArrayList<>();
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
+
+    @Column(nullable = false)
+    private Currency currency;
+
+    @Column(nullable = false)
+    private int quantity = 0;
 
 }
