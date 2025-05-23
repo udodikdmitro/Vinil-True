@@ -57,4 +57,11 @@ public class Product extends AuditableEntity<Long> {
     )
     private List<Review> reviews = new ArrayList<>();
 
+    @OneToMany(
+        mappedBy = "product",
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    private List<CartItem> cartItems = new ArrayList<>();
+
 }
