@@ -27,6 +27,7 @@ import java.util.Set;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final UserService userService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtProvider;
@@ -39,8 +40,7 @@ public class AuthService {
         User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRoles(Set.of(Role.USER));
-
-        userRepository.save(user);
+        userService.create(user);
     }
 
     public AuthResponse login(LoginRequest request) {
