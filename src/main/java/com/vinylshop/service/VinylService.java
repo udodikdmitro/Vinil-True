@@ -4,6 +4,7 @@ import com.vinylshop.dto.FileMetadataDto;
 import com.vinylshop.dto.VinylDto;
 import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Vinyl;
+import com.vinylshop.exception.InsufficientStockException;
 import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.mapper.FileMetadataMapper;
 import com.vinylshop.mapper.VinylMapper;
@@ -107,6 +108,19 @@ public class VinylService {
 
     public Optional<Vinyl> findById(Long id) {
         return vinylRepository.findById(id);
+    }
+
+    public void checkVinylQuantity(Vinyl vinyl, int quantity) throws InsufficientStockException {
+        final int vinylQuantity = vinyl.getQuantity();
+        if (vinylQuantity == 0) {
+            throw new InsufficientStockException(
+                    "Item is out of stock and cannot be added to the cart.",
+                    vinyl.getId(), "Vinyl", 0);
+        } else if (vinylQuantity < quantity) {
+            throw new InsufficientStockException(
+                    "Cannot add more items. Only " + vinyl.getQuantity() + " units available in stock.",
+                    vinyl.getId(), "Vinyl", vinyl.getQuantity());
+        }
     }
 
 }

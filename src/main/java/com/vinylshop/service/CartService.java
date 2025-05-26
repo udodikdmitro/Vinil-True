@@ -65,16 +65,19 @@ public class CartService {
 
     @Transactional
     public CartItemDto addItem(String email, Long vinylId) {
-        Cart cart = findByUserEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException(("Cart not found for user: " + email), email, "Cart"));
-
         Vinyl vinyl = vinylService.findById(vinylId)
                 .orElseThrow(() -> new ResourceNotFoundException(("Vinyl not found: " + vinylId), vinylId, "Vinyl"));
+
+        vinylService.checkVinylQuantity(vinyl, 1);
+
+        Cart cart = findByUserEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(("Cart not found for user: " + email), email, "Cart"));
 
         CartItem existingItem = cart.getItems().stream()
                 .filter(x -> Objects.equals(x.getVinyl().getId(), vinyl.getId()))
                 .findFirst()
                 .map(item -> {
+                    vinylService.checkVinylQuantity(vinyl, item.getQuantity() + 1);
                     item.setQuantity(item.getQuantity() + 1);
                     return cartItemRepository.save(item);
                 }).orElseGet(() -> {
@@ -92,8 +95,10 @@ public class CartService {
     public CartItemDto updateItem(String email, Long vinylId, CartItemUpdateRequest request) {
         CartItem cartItem = cartItemRepository.findByVinylIdAndUserEmail(vinylId, email)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found for: " + vinylId, vinylId, "CartItem"));
+        Vinyl vinyl = cartItem.getVinyl();
 
         if (request.getQuantity() != null) {
+            vinylService.checkVinylQuantity(vinyl, request.getQuantity());
             cartItem.setQuantity(request.getQuantity());
             cartItem = cartItemRepository.save(cartItem);
         }
