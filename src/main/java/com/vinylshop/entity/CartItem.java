@@ -22,7 +22,10 @@ public class CartItem extends BaseEntity<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.REFRESH, CascadeType.MERGE}
+    )
     @JoinColumn(name = "cart_id", foreignKey = @ForeignKey(name = "fk_cart_items_carts_id"))
     private Cart cart;
 
