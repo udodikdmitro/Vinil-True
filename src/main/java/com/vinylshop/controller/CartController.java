@@ -1,10 +1,10 @@
 package com.vinylshop.controller;
 
-import com.vinylshop.dto.*;
+import com.vinylshop.dto.CartDto;
+import com.vinylshop.dto.CartItemDto;
+import com.vinylshop.dto.CartItemUpdateRequest;
 import com.vinylshop.service.CartService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +20,9 @@ public class CartController {
 
     @GetMapping("/v1/me/cart")
     public ResponseEntity<CartDto> getCart(
-            @PageableDefault(page = 0, size = 10, sort = "id") Pageable pageable,
             Authentication authentication
     ) {
-        return ResponseEntity.of(cartService.getCartByUserEmailWithTotalPrice(authentication.getName(), pageable));
+        return ResponseEntity.of(cartService.getCartByUserEmailWithTotalPrice(authentication.getName()));
     }
 
     @PostMapping("/v1/me/cart/items/{vinylId}")

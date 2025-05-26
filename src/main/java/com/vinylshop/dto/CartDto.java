@@ -1,7 +1,6 @@
 package com.vinylshop.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vinylshop.entity.CartItem;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -23,7 +23,7 @@ public class CartDto {
 
     private String currency;
 
-    private PageDto<CartItemDto> items;
+    private List<CartItemDto> items;
 
     private LocalDateTime updatedAt;
 
