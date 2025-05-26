@@ -8,20 +8,18 @@ import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.mapper.FileMetadataMapper;
 import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.repository.VinylRepository;
-import com.vinylshop.upload.SsPictureDataUploadedFileAdapter;
+import com.vinylshop.util.ExcelUtil;
 import com.vinylshop.upload.UploadedFileAdapter;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ooxml.POIXMLDocumentPart;
-import org.apache.poi.ss.usermodel.PictureData;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -94,50 +92,17 @@ public class VinylService {
     public void importFromExcel(MultipartFile file) {
         try (InputStream is = file.getInputStream(); XSSFWorkbook workbook = new XSSFWorkbook(is)) {
             XSSFSheet sheet = workbook.getSheetAt(0);
-            Map<Integer, List<UploadedFileAdapter>> imageMap = extractPictureData(sheet);
+            Map<Integer, List<UploadedFileAdapter>> imageMap = ExcelUtil.extractPictureData(sheet);
 
             for (Row row : sheet) {
                 if (row.getRowNum() == 0) continue;
-                Vinyl vinyl = new Vinyl();
-                vinyl.setTitle(row.getCell(0).getStringCellValue());
-                vinyl.setArtist(row.getCell(1).getStringCellValue());
-                vinyl.setYear((int) row.getCell(2).getNumericCellValue());
-                vinyl.setPrice(BigDecimal.valueOf(row.getCell(3).getNumericCellValue()));
-                vinyl.setCurrency(Currency.getInstance(row.getCell(4).getStringCellValue()));
-                vinyl.setYear((int) row.getCell(5).getNumericCellValue());
-
+                Vinyl vinyl = ExcelUtil.getVinylFromRow(row);
                 List<UploadedFileAdapter> images = imageMap.getOrDefault(row.getRowNum(), Collections.emptyList());
                 save(vinyl, images);
             }
         } catch (IOException e) {
             throw new RuntimeException("Помилка імпорту", e);
         }
-    }
-
-    private Map<Integer, List<UploadedFileAdapter>> extractPictureData(XSSFSheet sheet) {
-        Map<Integer, List<UploadedFileAdapter>> colImageMap = new HashMap<>();
-
-        for (POIXMLDocumentPart part : sheet.getRelations()) {
-            if (part instanceof XSSFDrawing) {
-                XSSFDrawing drawing = (XSSFDrawing) part;
-                for (XSSFShape shape : drawing.getShapes()) {
-                    if (shape instanceof XSSFPicture) {
-                        XSSFPicture picture = (XSSFPicture) shape;
-                        XSSFClientAnchor anchor = picture.getPreferredSize();
-
-                        int row = anchor.getRow1();
-
-                        List<UploadedFileAdapter> colImages = colImageMap.computeIfAbsent(row, (k) -> new ArrayList<>());
-
-                        PictureData pictureData = picture.getPictureData();
-                        UploadedFileAdapter uploadedFileAdapter = new SsPictureDataUploadedFileAdapter(pictureData);
-                        colImages.add(uploadedFileAdapter);
-                    }
-                }
-            }
-        }
-
-        return colImageMap;
     }
 
     public Optional<Vinyl> findById(Long id) {
