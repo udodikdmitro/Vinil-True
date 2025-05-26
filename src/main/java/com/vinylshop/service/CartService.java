@@ -67,10 +67,13 @@ public class CartService {
 
         Product product = productService.getByIdOrThrow(productId);
 
+        productService.checkQuantity(product, 1);
+
         CartItem existingItem = cart.getItems().stream()
             .filter(x -> Objects.equals(x.getProduct().getId(), productId))
             .findFirst()
             .map(item -> {
+                productService.checkQuantity(product, item.getQuantity() + 1);
                 item.setQuantity(item.getQuantity() + 1);
                 return cartItemRepository.save(item);
             }).orElseGet(() -> {
@@ -89,8 +92,10 @@ public class CartService {
         CartItem cartItem = cartItemRepository.findByProductIdAndUserEmail(vinylId, email)
             .orElseThrow(() ->
                 new ResourceNotFoundException("Cart item not found for: " + vinylId, vinylId, "CartItem"));
+        Product product = cartItem.getProduct();
 
         if (request.getQuantity() != null) {
+            productService.checkQuantity(product, request.getQuantity());
             cartItem.setQuantity(request.getQuantity());
             cartItem = cartItemRepository.save(cartItem);
         }

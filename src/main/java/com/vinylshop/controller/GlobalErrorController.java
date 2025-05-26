@@ -1,8 +1,6 @@
 package com.vinylshop.controller;
 
-import com.vinylshop.exception.ResourceAlreadyExistException;
-import com.vinylshop.exception.ResourceException;
-import com.vinylshop.exception.ResourceNotFoundException;
+import com.vinylshop.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.AccessDeniedException;
@@ -42,10 +40,20 @@ public class GlobalErrorController {
     }
 
     @ExceptionHandler(ResourceAlreadyExistException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ProblemDetail handleResourceAlreadyExistException(ResourceAlreadyExistException ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problemDetail.setTitle("Already Exists");
+        problemDetail.setDetail(ex.getMessage());
+        problemDetail.setProperty("resource", ex.getResourceName());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ProblemDetail handleInsufficientStockException(InsufficientStockException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        problemDetail.setTitle(ex.getQuantity() > 0 ? "INSUFFICIENT_STOCK" : "OUT_OF_STOCK");
         problemDetail.setDetail(ex.getMessage());
         problemDetail.setProperty("resource", ex.getResourceName());
         return problemDetail;
