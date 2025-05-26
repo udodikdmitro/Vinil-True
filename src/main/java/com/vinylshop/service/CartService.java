@@ -3,20 +3,19 @@ package com.vinylshop.service;
 import com.vinylshop.dto.CartDto;
 import com.vinylshop.dto.CartItemDto;
 import com.vinylshop.dto.CartItemUpdateRequest;
-import com.vinylshop.dto.PageDto;
 import com.vinylshop.entity.*;
 import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.mapper.CartMapper;
 import com.vinylshop.repository.CartItemRepository;
 import com.vinylshop.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,23 +40,19 @@ public class CartService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<CartDto> getCartByUserEmailWithTotalPrice(String email, Pageable pageable) {
+    public Optional<CartDto> getCartByUserEmailWithTotalPrice(String email) {
         return findByUserEmail(email)
-            .map(x -> withTotalPrice(cartMapper.toDto(x)))
             .map(x -> {
-                x.setItems(getCartItemPage(email, pageable));
-                return x;
+                CartDto cartDto = withTotalPrice(cartMapper.toDto(x));
+                cartDto.setItems(x.getItems().stream()
+                    .map(item -> {
+                        CartItemDto dto = cartMapper.toDto(item);
+                        dto.setTotalPrice(calculateCartItemTotalPrice(item));
+                        return dto;
+                    }).collect(Collectors.toList())
+                );
+                return cartDto;
             });
-    }
-
-    @Transactional(readOnly = true)
-    public PageDto<CartItemDto> getCartItemPage(String email, Pageable pageable) {
-        return new PageDto<>(cartItemRepository.findAllByCartUserEmail(email, pageable)
-            .map(x -> {
-                CartItemDto dto = cartMapper.toDto(x);
-                dto.setTotalPrice(calculateCartItemTotalPrice(x));
-                return dto;
-            }));
     }
 
     @Transactional
