@@ -36,4 +36,12 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Currency currency;
 
+    @OneToOne(
+            mappedBy = "user",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Cart cart;
+
 }
