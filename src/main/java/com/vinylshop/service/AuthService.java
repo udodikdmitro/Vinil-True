@@ -6,6 +6,8 @@ import com.vinylshop.dto.RegisterRequest;
 import com.vinylshop.entity.RefreshToken;
 import com.vinylshop.entity.Role;
 import com.vinylshop.entity.User;
+import com.vinylshop.exception.InvalidTokenException;
+import com.vinylshop.exception.ResourceAlreadyExistException;
 import com.vinylshop.mapper.UserMapper;
 import com.vinylshop.repository.RefreshTokenRepository;
 import com.vinylshop.repository.UserRepository;
@@ -32,7 +34,7 @@ public class AuthService {
 
     public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Користувач з такою поштою вже існує");
+            throw new ResourceAlreadyExistException("Користувач з такою поштою вже існує", request.getEmail(), "User");
         }
         User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -64,10 +66,10 @@ public class AuthService {
 
     public AuthResponse refreshToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Недійсний токен"));
+                .orElseThrow(() -> new InvalidTokenException("Недійсний токен"));
 
         if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
-            throw new RuntimeException("Токен прострочено");
+            throw new InvalidTokenException("Токен прострочено");
         }
 
         User user = refreshToken.getUser();
