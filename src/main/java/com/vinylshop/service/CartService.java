@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,14 +25,6 @@ public class CartService {
     private final ProductService productService;
     private final CartMapper cartMapper;
 
-    @Transactional
-    Cart createForUser(User user) {
-        Cart cart = new Cart();
-        cart.setUser(user);
-        cart.setCurrency(user.getCurrency());
-        return cartRepository.save(cart);
-    }
-
     @Transactional(readOnly = true)
     public Optional<Cart> findByUserEmail(String email) {
         return cartRepository.findByUserEmail(email);
@@ -41,18 +32,7 @@ public class CartService {
 
     @Transactional(readOnly = true)
     public Optional<CartDto> getCartByUserEmailWithTotalPrice(String email) {
-        return findByUserEmail(email)
-            .map(x -> {
-                CartDto cartDto = withTotalPrice(cartMapper.toDto(x));
-                cartDto.setItems(x.getItems().stream()
-                    .map(item -> {
-                        CartItemDto dto = cartMapper.toDto(item);
-                        dto.setTotalPrice(calculateCartItemTotalPrice(item));
-                        return dto;
-                    }).collect(Collectors.toList())
-                );
-                return cartDto;
-            });
+        return findByUserEmail(email).map(this::toDtoWithTotalPrice);
     }
 
     @Transactional
@@ -77,8 +57,9 @@ public class CartService {
                 return createdItem;
             });
 
-        CartItemDto cartItemDto = cartMapper.toDto(existingItem);
-        cartItemDto.setTotalPrice(calculateCartItemTotalPrice(existingItem));
+        final Currency currency = cart.getCurrency();
+        final CartItemDto cartItemDto = cartMapper.toDto(existingItem);
+        cartItemDto.setTotalPrice(calculateCartItemTotalPrice(existingItem, currency, null));
         return cartItemDto;
     }
 
@@ -95,8 +76,9 @@ public class CartService {
             cartItem = cartItemRepository.save(cartItem);
         }
 
-        CartItemDto cartItemDto = cartMapper.toDto(cartItem);
-        cartItemDto.setTotalPrice(calculateCartItemTotalPrice(cartItem));
+        final Currency currency = cartItem.getCart().getCurrency();
+        final CartItemDto cartItemDto = cartMapper.toDto(cartItem);
+        cartItemDto.setTotalPrice(calculateCartItemTotalPrice(cartItem, currency, null));
         return cartItemDto;
     }
 
@@ -111,19 +93,53 @@ public class CartService {
     }
 
     @Transactional(readOnly = true)
-    public CartDto withTotalPrice(CartDto dto) {
-        dto.setTotalPrice(calculateTotalPrice(dto.getId()));
-        return dto;
+    public CartDto toDtoWithTotalPrice(Cart cart) {
+        if (cart == null) return null;
+        final CartDto cartDto = cartMapper.toDto(cart);
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
+            cartDto.setTotalPrice(BigDecimal.ZERO);
+            cartDto.setItems(new ArrayList<>());
+        } else {
+            final Map<Long, BigDecimal> itemTotalPrices = new HashMap<>(cart.getItems().size(), 1.0f);
+            cartDto.setTotalPrice(calculateTotalPrice(cart, itemTotalPrices));
+            cartDto.setItems(cart.getItems().stream()
+                    .map(x -> toDtoWithTotalPrice(x, itemTotalPrices.get(x.getId())))
+                    .collect(Collectors.toList()));
+        }
+        return cartDto;
     }
 
     @Transactional(readOnly = true)
-    public BigDecimal calculateTotalPrice(Long cartId) {
-        return Optional.ofNullable(cartItemRepository.calculateTotalPriceByCartId(cartId))
-            .orElse(BigDecimal.ZERO);
+    public CartItemDto toDtoWithTotalPrice(CartItem item, BigDecimal itemTotalPrice) {
+        CartItemDto cartDto = cartMapper.toDto(item);
+        cartDto.setTotalPrice(itemTotalPrice);
+        return cartDto;
     }
 
-    public BigDecimal calculateCartItemTotalPrice(CartItem cartItem) {
-        return cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+    public BigDecimal calculateTotalPrice(Cart cart, Map<Long, BigDecimal> totalPrices) {
+        BigDecimal total = BigDecimal.ZERO;
+        if (cart != null && cart.getItems() != null) {
+            final Currency currency = cart.getCurrency();
+            for(CartItem item : cart.getItems()) {
+                BigDecimal itemTotalPrice = calculateCartItemTotalPrice(item, currency, totalPrices);
+                total = total.add(itemTotalPrice);
+            }
+        }
+        return total;
+    }
+
+    public BigDecimal calculateCartItemTotalPrice(CartItem item, Currency currency, Map<Long, BigDecimal> itemTotalPrices) {
+        final int quantity = item.getQuantity();
+        final Currency itemCurrency = item.getCart().getCurrency();
+        BigDecimal price = item.getProduct().getPrice();
+
+        if (!Objects.equals(currency, itemCurrency)) {
+            // Add currency conversion logic here if needed
+        }
+
+        BigDecimal itemTotalPrice = price.multiply(BigDecimal.valueOf(quantity));
+        if (itemTotalPrices != null) itemTotalPrices.put(item.getId(), itemTotalPrice);
+        return itemTotalPrice;
     }
 
 }
