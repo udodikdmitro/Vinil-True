@@ -1,16 +1,21 @@
 package com.vinylshop.service;
 
 import com.vinylshop.dto.UserDto;
+import com.vinylshop.entity.Cart;
 import com.vinylshop.entity.User;
 import com.vinylshop.mapper.UserMapper;
 import com.vinylshop.repository.UserRepository;
+import com.vinylshop.util.Constants;
+import com.vinylshop.util.CurrencyUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,15 +23,22 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    private final CartService cartService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Transactional
     public User create(User user) {
-        User created = userRepository.save(user);
-        cartService.createForUser(created);
-        return created;
+        if (user.getCurrency() == null) {
+            final Currency currency = CurrencyUtil.getCurrencyFromLocaleOrDefault(LocaleContextHolder.getLocale(), Constants.DEFAULT_CURRENCY);
+            user.setCurrency(currency);
+        }
+
+        final Cart cart = new Cart();
+        cart.setCurrency(user.getCurrency());
+        cart.setUser(user);
+
+        user.setCart(cart);
+        return userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
