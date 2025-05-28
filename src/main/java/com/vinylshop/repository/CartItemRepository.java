@@ -10,12 +10,15 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     @Query("SELECT ci FROM CartItem ci JOIN FETCH ci.product p WHERE p.id = :productId AND ci.cart.user.email = :userEmail")
     Optional<CartItem> findByProductIdAndUserEmail(Long productId, String userEmail);
+
+    Stream<CartItem> findAllByCartId(Long id);
 
     Page<CartItem> findAllByCartUserEmail(String email, Pageable pageable);
 
