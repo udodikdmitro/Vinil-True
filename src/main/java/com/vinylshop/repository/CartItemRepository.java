@@ -11,12 +11,15 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     @Query("SELECT ci FROM CartItem ci WHERE ci.vinyl.id = :vinylId AND ci.cart.user.email = :userEmail")
     Optional<CartItem> findByVinylIdAndUserEmail(@Param("vinylId") Long vinylId, @Param("userEmail") String userEmail);
+
+    Stream<CartItem> findAllByCartId(Long id);
 
     Page<CartItem> findAllByCartUserEmail(String email, Pageable pageable);
 

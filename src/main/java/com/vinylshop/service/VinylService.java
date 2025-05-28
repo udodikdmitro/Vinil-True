@@ -9,6 +9,7 @@ import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.mapper.FileMetadataMapper;
 import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.repository.VinylRepository;
+import com.vinylshop.util.Constants;
 import com.vinylshop.util.ExcelUtil;
 import com.vinylshop.upload.UploadedFileAdapter;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -31,15 +33,20 @@ public class VinylService {
     private final FileService fileService;
     private final VinylMapper vinylMapper;
     private final FileMetadataMapper fileMetadataMapper;
+    private final CurrencyConversionService conversionService;
 
     public List<VinylDto> findTop10ForMainPage() {
-        return vinylMapper.toDtoAll(vinylRepository.findTop10ByOrderByYearDesc())
+        return vinylMapper.toDtoAll(vinylRepository.findTop10ByOrderByYearDesc().stream()
+                        .map(this::convertPriceToPreferred)
+                        .toList())
                 .toList();
     }
 
     @Transactional
     public VinylDto saveFromDto(VinylDto dto, Collection<MultipartFile> files) {
         Vinyl vinyl = vinylMapper.toEntity(dto);
+
+        convertPriceToDefault(vinyl);
 
         if (files != null && !files.isEmpty()) {
             vinyl.setImages(fileService.saveFilesFromMultipartFiles(files));
@@ -52,13 +59,14 @@ public class VinylService {
 
     @Transactional
     public Vinyl save(Vinyl vinyl, Collection<UploadedFileAdapter> images) {
+        convertPriceToDefault(vinyl);
         vinyl.setImages(fileService.saveFilesFromUploadedFileAdapters(images));
         return vinylRepository.save(vinyl);
     }
 
     @Transactional
     public List<FileMetadataDto> addImagesFromMultipartFiles(Long id, List<MultipartFile> files) {
-        Vinyl vinyl = vinylRepository.findById(id)
+        Vinyl vinyl = findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
 
         vinyl.getImages().addAll(fileService.saveFilesFromMultipartFiles(files));
@@ -69,7 +77,7 @@ public class VinylService {
 
     @Transactional
     public List<FileMetadata> addImagesFromUploadedFileAdapters(Long id, List<UploadedFileAdapter> files) {
-        Vinyl vinyl = vinylRepository.findById(id)
+        Vinyl vinyl = findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
         vinyl.getImages().addAll(fileService.saveFilesFromUploadedFileAdapters(files));
         vinyl = vinylRepository.save(vinyl);
@@ -78,7 +86,7 @@ public class VinylService {
 
     @Transactional
     public List<FileMetadata> removeImages(Long id, List<Long> fileIds) {
-        Vinyl vinyl = vinylRepository.findById(id)
+        Vinyl vinyl = findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
 
         vinyl.getImages().removeIf(x -> fileIds.contains(x.getId()));
@@ -107,7 +115,7 @@ public class VinylService {
     }
 
     public Optional<Vinyl> findById(Long id) {
-        return vinylRepository.findById(id);
+        return vinylRepository.findById(id).map(this::convertPriceToPreferred);
     }
 
     public void checkVinylQuantity(Vinyl vinyl, int quantity) throws InsufficientStockException {
@@ -121,6 +129,46 @@ public class VinylService {
                     "Cannot add more items. Only " + vinyl.getQuantity() + " units available in stock.",
                     vinyl.getId(), "Vinyl", vinyl.getQuantity());
         }
+    }
+
+    public Vinyl convertPriceToDefault(Vinyl vinyl) {
+        final BigDecimal price = vinyl.getPrice();
+        final Currency originalCurrency = vinyl.getCurrency();
+
+        vinyl.setOriginalPrice(price);
+        vinyl.setOriginalCurrency(originalCurrency);
+
+        final BigDecimal convertedPrice = conversionService.convert(price, originalCurrency, Constants.DEFAULT_CURRENCY);
+        vinyl.setPrice(convertedPrice);
+        vinyl.setCurrency(Constants.DEFAULT_CURRENCY);
+        return vinyl;
+    }
+
+    public Vinyl convertPriceToPreferred(Vinyl vinyl) {
+        final Currency toCurrency = PreferredCurrencyHolder.getCurrency();
+        final Currency fromCurrency = vinyl.getCurrency();
+        final BigDecimal convertedPrice = conversionService.convert(vinyl.getPrice(), fromCurrency, toCurrency);
+        vinyl.setPrice(convertedPrice);
+        vinyl.setCurrency(toCurrency);
+        return vinyl;
+    }
+
+    public VinylDto convertPriceToPreferred(VinylDto vinyl) {
+        final Currency toCurrency = PreferredCurrencyHolder.getCurrency();
+        final Currency fromCurrency = Currency.getInstance(vinyl.getCurrency());
+        final BigDecimal convertedPrice = conversionService.convert(vinyl.getPrice(), fromCurrency, toCurrency);
+        vinyl.setPrice(convertedPrice);
+        vinyl.setCurrency(toCurrency.getCurrencyCode());
+        return vinyl;
+    }
+
+    public Vinyl convertPriceToOriginal(Vinyl vinyl) {
+        final Currency fromCurrency = vinyl.getCurrency();
+        final Currency originalCurrency = vinyl.getOriginalCurrency();
+        final BigDecimal convertedPrice = conversionService.convert(vinyl.getPrice(), fromCurrency, originalCurrency);
+        vinyl.setPrice(convertedPrice);
+        vinyl.setCurrency(originalCurrency);
+        return vinyl;
     }
 
 }
