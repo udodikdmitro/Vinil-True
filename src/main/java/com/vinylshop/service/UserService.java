@@ -6,9 +6,7 @@ import com.vinylshop.entity.User;
 import com.vinylshop.mapper.UserMapper;
 import com.vinylshop.repository.UserRepository;
 import com.vinylshop.util.Constants;
-import com.vinylshop.util.CurrencyUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,12 +27,11 @@ public class UserService implements UserDetailsService {
     @Transactional
     public User create(User user) {
         if (user.getCurrency() == null) {
-            final Currency currency = CurrencyUtil.getCurrencyFromLocaleOrDefault(LocaleContextHolder.getLocale(), Constants.DEFAULT_CURRENCY);
+            final Currency currency = Constants.DEFAULT_CURRENCY;
             user.setCurrency(currency);
         }
 
         final Cart cart = new Cart();
-        cart.setCurrency(user.getCurrency());
         cart.setUser(user);
 
         user.setCart(cart);
@@ -63,6 +60,10 @@ public class UserService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
+                .map(x -> {
+                    PreferredCurrencyHolder.setCurrency(x.getCurrency());
+                    return x;
+                })
                 .map(userMapper::toUserDetails)
                 .orElseThrow(() -> new UsernameNotFoundException("Користувача з таким іменем не знайдено: " + username));
     }
