@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
 
 @Entity
@@ -40,8 +39,5 @@ public class Cart extends AuditableEntity<Long> {
         fetch = FetchType.LAZY
     )
     private List<CartItem> items = new ArrayList<>();
-
-    @Column(nullable = false, length = 3)
-    private Currency currency;
 
 }

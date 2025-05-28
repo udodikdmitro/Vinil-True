@@ -1,7 +1,6 @@
 create table carts (
     id bigserial not null,
     user_id bigint not null,
-    currency varchar(255) not null,
     created_at timestamp(6),
     updated_at timestamp(6),
     constraint pk_carts_id primary key (id),
