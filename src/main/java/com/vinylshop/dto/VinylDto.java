@@ -24,6 +24,8 @@ public class VinylDto {
     private Integer year;
     private BigDecimal price;
     private String currency;
+    private BigDecimal originalPrice;
+    private String originalCurrency;
     private Integer quantity;
 
 }
