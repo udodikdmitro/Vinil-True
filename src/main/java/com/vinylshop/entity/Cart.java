@@ -3,6 +3,8 @@ package com.vinylshop.entity;
 import com.vinylshop.entity.base.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,7 @@ public class Cart extends AuditableEntity<Long> {
         optional = false
     )
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_carts_users_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @OneToMany(

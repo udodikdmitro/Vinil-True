@@ -3,6 +3,8 @@ package com.vinylshop.entity;
 import com.vinylshop.entity.base.CreatableEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 
@@ -32,6 +34,7 @@ public class RefreshToken extends CreatableEntity<Long> {
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
 }
