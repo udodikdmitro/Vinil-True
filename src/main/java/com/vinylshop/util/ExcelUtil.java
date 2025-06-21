@@ -29,15 +29,7 @@ public final class ExcelUtil {
             new CellHandler(1, CellType.STRING, (vinyl, cell) -> vinyl.setArtist(cell.getStringCellValue())),
             new CellHandler(2, CellType.NUMERIC, (vinyl, cell) -> vinyl.setYear((int) cell.getNumericCellValue())),
             new CellHandler(3, CellType.NUMERIC, (vinyl, cell) -> vinyl.setPrice(BigDecimal.valueOf(cell.getNumericCellValue()))),
-            new CellHandler(4, CellType.STRING, (vinyl, cell) -> {
-                try {
-                    Currency currency = Currency.getInstance(cell.getStringCellValue());
-                    vinyl.setCurrency(currency);
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalStateException("Invalid currency code: " + cell.getStringCellValue(), e);
-                }
-            }),
-            new CellHandler(5, CellType.NUMERIC, (vinyl, cell) -> vinyl.setQuantity((int) cell.getNumericCellValue()))
+            new CellHandler(4, CellType.NUMERIC, (vinyl, cell) -> vinyl.setQuantity((int) cell.getNumericCellValue()))
     );
 
     public static Vinyl getVinylFromRow(Row row) {

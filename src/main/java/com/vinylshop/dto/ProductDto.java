@@ -20,10 +20,6 @@ public class ProductDto {
 
     private Currency currency;
 
-    private BigDecimal originalPrice;
-
-    private String originalCurrency;
-
     private Integer quantity;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

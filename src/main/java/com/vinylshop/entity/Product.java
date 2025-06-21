@@ -34,12 +34,6 @@ public class Product extends AuditableEntity<Long> {
     @Column(nullable = false)
     private Currency currency;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal originalPrice;
-
-    @Column(nullable = false)
-    private Currency originalCurrency;
-
     @Column(nullable = false)
     private int quantity = 0;
 

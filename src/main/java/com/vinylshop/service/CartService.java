@@ -23,7 +23,6 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final ProductService productService;
     private final CartMapper cartMapper;
-    private final CurrencyConversionService conversionService;
 
     @Transactional(readOnly = true)
     public Optional<Cart> findByUserEmail(String email) {
@@ -57,9 +56,8 @@ public class CartService {
                 return createdItem;
             });
 
-        final Currency currency = PreferredCurrencyHolder.getCurrency();
         final CartItemDto cartItemDto = cartMapper.toDto(existingItem);
-        cartItemDto.setTotalPrice(calculateCartItemTotalPrice(existingItem, currency));
+        cartItemDto.setTotalPrice(calculateCartItemTotalPrice(existingItem));
         return cartItemDto;
     }
 
@@ -76,9 +74,8 @@ public class CartService {
             cartItem = cartItemRepository.save(cartItem);
         }
 
-        final Currency currency = PreferredCurrencyHolder.getCurrency();
         final CartItemDto cartItemDto = cartMapper.toDto(cartItem);
-        cartItemDto.setTotalPrice(calculateCartItemTotalPrice(cartItem, currency));
+        cartItemDto.setTotalPrice(calculateCartItemTotalPrice(cartItem));
         return cartItemDto;
     }
 
@@ -97,7 +94,6 @@ public class CartService {
         if (cart == null) return null;
 
         CartDto cartDto = cartMapper.toDto(cart);
-        cartDto.setCurrency(PreferredCurrencyHolder.getCurrency().getCurrencyCode());
 
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
             cartDto.setItems(new ArrayList<>());
@@ -125,7 +121,7 @@ public class CartService {
         BigDecimal totalPrice = BigDecimal.ZERO;
 
         for (CartItem item : cart.getItems()) {
-            BigDecimal itemTotalPrice = calculateCartItemTotalPrice(item, PreferredCurrencyHolder.getCurrency());
+            BigDecimal itemTotalPrice = calculateCartItemTotalPrice(item);
             CartItemDto dto = toDtoWithTotalPrice(item, itemTotalPrice);
             if (itemDtos != null) {
                 itemDtos.add(dto);
@@ -136,15 +132,9 @@ public class CartService {
         return totalPrice;
     }
 
-    public BigDecimal calculateCartItemTotalPrice(CartItem item, Currency currency) {
+    public BigDecimal calculateCartItemTotalPrice(CartItem item) {
         final int quantity = item.getQuantity();
-        final Currency itemCurrency = item.getProduct().getCurrency();
         BigDecimal price = item.getProduct().getPrice();
-
-        if (!Objects.equals(currency, itemCurrency)) {
-            price = conversionService.convert(price, itemCurrency, currency);
-        }
-
         return price.multiply(BigDecimal.valueOf(quantity));
     }
 

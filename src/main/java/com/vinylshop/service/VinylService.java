@@ -10,7 +10,6 @@ import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.mapper.FileMetadataMapper;
 import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.repository.VinylRepository;
-import com.vinylshop.util.Constants;
 import com.vinylshop.util.ExcelUtil;
 import com.vinylshop.upload.UploadedFileAdapter;
 import com.vinylshop.util.SpecificationFactory;
@@ -27,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.*;
 
 import static com.vinylshop.util.Constants.DEFAULT_CURRENCY;
@@ -41,11 +39,9 @@ public class VinylService {
     private final VinylMapper vinylMapper;
     private final FileMetadataMapper fileMetadataMapper;
     private final GenreService genreService;
-    private final CurrencyConversionService conversionService;
 
     public List<VinylDto> findTop10ForMainPage() {
         return vinylRepository.findTop10ByOrderByYearDesc().stream()
-            .map(this::convertPriceToPreferred)
             .map(x -> vinylMapper.toLocalizeDto(x, LocaleContextHolder.getLocale()))
             .toList();
     }
@@ -65,8 +61,6 @@ public class VinylService {
             vinyl.setQuantity(1);
         }
         vinyl.setCurrency(DEFAULT_CURRENCY);
-
-        convertPriceToDefault(vinyl);
 
         if (files != null && !files.isEmpty()) {
             vinyl.setImages(fileService.saveFilesFromMultipartFiles(files));
@@ -90,8 +84,6 @@ public class VinylService {
             vinyl.setQuantity(1);
         }
         vinyl.setCurrency(DEFAULT_CURRENCY);
-
-        convertPriceToDefault(vinyl);
 
         vinyl.setImages(fileService.saveFilesFromUploadedFileAdapters(images));
         return vinylRepository.save(vinyl);
@@ -148,7 +140,7 @@ public class VinylService {
     }
 
     public Optional<Vinyl> findById(Long id) {
-        return vinylRepository.findById(id).map(this::convertPriceToPreferred);
+        return vinylRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
@@ -156,46 +148,6 @@ public class VinylService {
         Specification<Vinyl> specification = SpecificationFactory.create(filter);
         return vinylRepository.findAll(specification, pageable)
             .map(x -> vinylMapper.toLocalizeDto(x, LocaleContextHolder.getLocale()));
-    }
-
-    public Vinyl convertPriceToDefault(Vinyl vinyl) {
-        final BigDecimal price = vinyl.getPrice();
-        final Currency originalCurrency = vinyl.getCurrency();
-
-        vinyl.setOriginalPrice(price);
-        vinyl.setOriginalCurrency(originalCurrency);
-
-        final BigDecimal convertedPrice = conversionService.convert(price, originalCurrency, Constants.DEFAULT_CURRENCY);
-        vinyl.setPrice(convertedPrice);
-        vinyl.setCurrency(Constants.DEFAULT_CURRENCY);
-        return vinyl;
-    }
-
-    public Vinyl convertPriceToPreferred(Vinyl vinyl) {
-        final Currency toCurrency = PreferredCurrencyHolder.getCurrency();
-        final Currency fromCurrency = vinyl.getCurrency();
-        final BigDecimal convertedPrice = conversionService.convert(vinyl.getPrice(), fromCurrency, toCurrency);
-        vinyl.setPrice(convertedPrice);
-        vinyl.setCurrency(toCurrency);
-        return vinyl;
-    }
-
-    public VinylDto convertPriceToPreferred(VinylDto vinyl) {
-        final Currency toCurrency = PreferredCurrencyHolder.getCurrency();
-        final Currency fromCurrency = Currency.getInstance(vinyl.getCurrency());
-        final BigDecimal convertedPrice = conversionService.convert(vinyl.getPrice(), fromCurrency, toCurrency);
-        vinyl.setPrice(convertedPrice);
-        vinyl.setCurrency(toCurrency.getCurrencyCode());
-        return vinyl;
-    }
-
-    public Vinyl convertPriceToOriginal(Vinyl vinyl) {
-        final Currency fromCurrency = vinyl.getCurrency();
-        final Currency originalCurrency = vinyl.getOriginalCurrency();
-        final BigDecimal convertedPrice = conversionService.convert(vinyl.getPrice(), fromCurrency, originalCurrency);
-        vinyl.setPrice(convertedPrice);
-        vinyl.setCurrency(originalCurrency);
-        return vinyl;
     }
 
 }

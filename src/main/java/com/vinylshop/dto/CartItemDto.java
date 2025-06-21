@@ -17,7 +17,7 @@ public class CartItemDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
-    private VinylDto vinyl;
+    private ProductDto product;
 
     private Integer quantity;
 
