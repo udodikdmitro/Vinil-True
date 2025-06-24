@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @RestController
@@ -33,8 +34,11 @@ public class VinylController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VinylDto> getVinyl(@PathVariable("id") Long id) {
-        return ResponseEntity.of(vinylService.findById(id).map(vinylMapper::toDto));
+    public ResponseEntity<VinylDto> getVinyl(
+        @PathVariable("id") Long id,
+        Locale locale
+    ) {
+        return ResponseEntity.of(vinylService.findById(id).map(x -> vinylMapper.toLocalizeDto(x, locale)));
     }
 
     @GetMapping("/{id}/images")
