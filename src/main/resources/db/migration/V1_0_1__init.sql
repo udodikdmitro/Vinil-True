@@ -26,6 +26,17 @@ create table refresh_tokens (
     constraint pk_refresh_token_id primary key (id)
 );
 
+create table products (
+    id bigserial not null,
+    title varchar(255) not null,
+    price decimal(10, 2) not null,
+    currency varchar(3) not null,
+    quantity integer not null,
+    created_at timestamp(6) default CURRENT_TIMESTAMP,
+    updated_at timestamp(6) default CURRENT_TIMESTAMP,
+    constraint pk_products_id primary key (id)
+);
+
 create table vinyl (
     id bigserial not null,
     album varchar(255) not null,
@@ -35,13 +46,9 @@ create table vinyl (
     genre_id bigserial,
     condition varchar(255) not null,
     envelope_condition varchar(255) not null,
-    price decimal(10, 2) not null,
-    currency varchar(3) not null,
     "year" integer not null,
     artist varchar(255) not null,
-    title varchar(255) not null,
     release_type varchar(255) not null,
-    quantity integer not null,
     note text,
     created_at timestamp(6) default CURRENT_TIMESTAMP,
     updated_at timestamp(6) default CURRENT_TIMESTAMP,
@@ -51,4 +58,9 @@ create table vinyl (
 alter table user_roles
 add constraint fk_user_roles_users_id
 foreign key (user_id) references users(id)
+MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+alter table vinyl
+add constraint fk_vinyl_products_id
+FOREIGN KEY (id) REFERENCES products(id)
 MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;

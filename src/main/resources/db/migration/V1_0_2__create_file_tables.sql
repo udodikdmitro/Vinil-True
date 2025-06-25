@@ -24,7 +24,7 @@ create table file_metadatas (
 
 create table files_references (
     file_metadata_id bigint not null primary key,
-    vinyl_id bigint
+    product_id bigint
 );
 
 alter table vinyl drop column if exists image;
@@ -40,8 +40,8 @@ foreign key (file_metadata_id) references file_metadatas(id)
 on delete cascade;
 
 alter table files_references
-add constraint fk_files_references_vinyl
-foreign key (vinyl_id) references vinyl(id)
+add constraint fk_files_references_products
+foreign key (product_id) references products(id)
 on delete cascade;
 
 create or replace function delete_orphan_file_metadata() returns trigger as $$

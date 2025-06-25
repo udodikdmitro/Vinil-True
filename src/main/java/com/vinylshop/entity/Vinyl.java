@@ -2,12 +2,10 @@
 package com.vinylshop.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Currency;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Сутність, яка представляє вінілову платівку
@@ -18,11 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Vinyl extends BaseEntity {
-
-    @Column(nullable = false)
-    private String title;
+public class Vinyl extends Product {
 
     @Column(nullable = false)
     private String album;
@@ -48,30 +42,8 @@ public class Vinyl extends BaseEntity {
     @Column(nullable = false)
     private String envelopeCondition;
 
-    @Column(nullable = false)
-    private BigDecimal price;
-
-    @Column(nullable = false)
-    private Currency currency;
-
-    @OneToMany(
-            fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    @JoinTable(
-            name = "files_references",
-            joinColumns = @JoinColumn(name = "vinyl_id", foreignKey = @ForeignKey(name = "fk_files_references_vinyl")),
-            inverseJoinColumns = @JoinColumn(name = "file_metadata_id", foreignKey = @ForeignKey(name = "fk_files_references_file_metadatas"))
-    )
-    @Builder.Default
-    private List<FileMetadata> images = new ArrayList<>();
-
     @Column(columnDefinition = "TEXT")
     private String note;
-
-    @Column(nullable = false)
-    private int quantity = 0;
 
     @ManyToOne
     @JoinColumn(name = "genre_id", foreignKey = @ForeignKey(name = "fk_vinyls_genres_id"))
