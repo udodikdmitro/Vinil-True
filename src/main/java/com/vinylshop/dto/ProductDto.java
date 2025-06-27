@@ -17,7 +17,8 @@ import java.util.List;
     property = "type"
 )
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = VinylDto.class, name = "vinyl")
+    @JsonSubTypes.Type(value = VinylDto.class, name = "vinyl"),
+    @JsonSubTypes.Type(value = VinylDto.class, name = "giftCertificate")
 })
 public class ProductDto {
 
