@@ -44,4 +44,12 @@ public abstract class Product extends BaseEntity {
     )
     private List<FileMetadata> images = new ArrayList<>();
 
+    @OneToMany(
+        mappedBy = "product",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Review> reviews = new ArrayList<>();
+
 }
