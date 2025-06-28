@@ -1,8 +1,6 @@
 package com.vinylshop.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,15 +9,6 @@ import java.util.Currency;
 import java.util.List;
 
 @Data
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.PROPERTY,
-    property = "type"
-)
-@JsonSubTypes({
-    @JsonSubTypes.Type(value = VinylDto.class, name = "vinyl"),
-    @JsonSubTypes.Type(value = VinylDto.class, name = "giftCertificate")
-})
 public class ProductDto {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
