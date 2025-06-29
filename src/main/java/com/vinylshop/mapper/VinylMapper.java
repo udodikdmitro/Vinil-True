@@ -1,13 +1,15 @@
 package com.vinylshop.mapper;
 
 import com.vinylshop.dto.GenreDto;
+import com.vinylshop.dto.ProductDto;
 import com.vinylshop.dto.VinylDto;
 import com.vinylshop.entity.FileMetadata;
-import com.vinylshop.entity.Genre;
+import com.vinylshop.entity.Product;
 import com.vinylshop.entity.Vinyl;
-import jdk.jfr.Name;
-import org.mapstruct.*;
-import org.springframework.cglib.core.Local;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import org.mapstruct.Named;
 
 import java.util.List;
 import java.util.Locale;
@@ -26,6 +28,11 @@ public interface VinylMapper {
         @Mapping(target = "imageUrls", source = "entity", qualifiedByName = "mapFileMetadataToUrl")
     })
     VinylDto toDto(Vinyl entity);
+
+    @Mappings({
+        @Mapping(target = "imageUrls", source = "entity", qualifiedByName = "mapFileMetadataToUrl")
+    })
+    ProductDto toProductDto(Product entity);
 
     Stream<VinylDto> toDtoAll(Iterable<Vinyl> entities);
 
@@ -46,7 +53,7 @@ public interface VinylMapper {
     }
 
     @Named("mapFileMetadataToUrl")
-    default List<String> mapFileMetadataToUrl(Vinyl entity) {
+    default List<String> mapFileMetadataToUrl(Product entity) {
         return entity.getImages()
                 .stream()
                 .map(FileMetadata::getContentUrl)

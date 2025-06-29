@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "products")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Product extends BaseEntity {
+public class Product extends BaseEntity {
 
     @Column(nullable = false)
     private String title;

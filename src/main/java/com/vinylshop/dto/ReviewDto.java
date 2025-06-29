@@ -11,9 +11,9 @@ public class ReviewDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
-    private ProductDto productDto;
+    private ProductDto product;
 
-    private UserDto userDto;
+    private UserDto user;
 
     private Integer rating;
 
