@@ -1,8 +1,10 @@
 package com.vinylshop.util;
 
 import com.vinylshop.dto.filter.ReviewFilter;
+import com.vinylshop.dto.filter.VinylFilter;
 import com.vinylshop.entity.Product;
 import com.vinylshop.entity.Review;
+import com.vinylshop.entity.Vinyl;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -26,6 +28,19 @@ public final class SpecificationFactory {
                 Predicate predicate = cb.equal(productJoin.get("id"), filter.productId());
                 predicates.add(predicate);
             }
+
+            return cb.and(predicates.toArray(Predicate[]::new));
+        };
+    }
+
+    public static Specification<Vinyl> create(VinylFilter filter) {
+        return (root, query, cb) -> {
+            if (filter == null) {
+                return null;
+            }
+            final List<Predicate> predicates = new ArrayList<>();
+
+
 
             return cb.and(predicates.toArray(Predicate[]::new));
         };

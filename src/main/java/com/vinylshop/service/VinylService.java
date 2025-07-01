@@ -2,6 +2,7 @@ package com.vinylshop.service;
 
 import com.vinylshop.dto.FileMetadataDto;
 import com.vinylshop.dto.VinylDto;
+import com.vinylshop.dto.filter.VinylFilter;
 import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Genre;
 import com.vinylshop.entity.Vinyl;
@@ -11,12 +12,16 @@ import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.repository.VinylRepository;
 import com.vinylshop.upload.SsPictureDataUploadedFileAdapter;
 import com.vinylshop.upload.UploadedFileAdapter;
+import com.vinylshop.util.SpecificationFactory;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ooxml.POIXMLDocumentPart;
 import org.apache.poi.ss.usermodel.PictureData;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -174,6 +179,13 @@ public class VinylService {
 
     public Optional<Vinyl> findById(Long id) {
         return vinylRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<VinylDto> findAll(VinylFilter filter, Pageable pageable) {
+        Specification<Vinyl> specification = SpecificationFactory.create(filter);
+        return vinylRepository.findAll(specification, pageable)
+            .map(x -> vinylMapper.toLocalizeDto(x, LocaleContextHolder.getLocale()));
     }
 
 }
