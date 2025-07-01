@@ -4,7 +4,6 @@ import com.vinylshop.security.JwtAuthFilter;
 import com.vinylshop.security.JwtTokenProvider;
 import com.vinylshop.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -31,12 +30,16 @@ public class SecurityConfig {
         return http
                 .csrf(x -> x.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/api/v1/genres", "/api/v1/genres/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
+                            "/api/v1/files/**",
+                            "/api/v1/genres",
+                            "/api/v1/genres/**",
+                            "/api/v1/vinyls/**",
                             "/api/v1/products/reviews",
                             "/api/v1/products/reviews/**"
                         ).permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
