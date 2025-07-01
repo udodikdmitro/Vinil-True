@@ -70,8 +70,33 @@ public class GenreService {
         return genreRepository.findByNameEnOrNameUk(name, name);
     }
 
+    @Transactional
+    public GenreDto updateById(Long id, GenreRequest genreRequest, Locale locale) throws ResourceNotFoundException {
+        Genre genre = new Genre(genreRequest.nameEn(), genreRequest.nameUk());
+        Genre created = updateById(id, genre);
+        return genreMapper.toDto(created, locale);
+    }
+
+    @Transactional
+    public Genre updateById(Long id, Genre genre) throws ResourceNotFoundException {
+        Genre found = getByIdOrThrow(id);
+        if (genre.getNameEn() != null) {
+            found.setNameEn(genre.getNameEn());
+        }
+        if (genre.getNameUk() != null) {
+            found.setNameUk(genre.getNameUk());
+        }
+        return genreRepository.save(found);
+    }
+
+    @Transactional
+    public void deleteById(Long id) throws ResourceNotFoundException {
+        Genre found = getByIdOrThrow(id);
+        genreRepository.deleteById(id);
+    }
+
     @Transactional(readOnly = true)
-    public Genre getByIdOrThrow(Long id) {
+    public Genre getByIdOrThrow(Long id) throws ResourceNotFoundException {
         return getById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Genre " + id + " not found", id, "Genre"));
     }

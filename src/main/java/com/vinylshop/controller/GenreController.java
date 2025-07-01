@@ -37,8 +37,30 @@ public class GenreController {
     }
 
     @GetMapping("/v1/genres")
-    public ResponseEntity<List<GenreDto>> getAll(Locale locale) {
-        return ResponseEntity.ok(genreService.getAllLocalizedGenres(locale));
+    public ResponseEntity<List<?>> getAll(
+        @RequestParam(value = "localize", required = false, defaultValue = "true") boolean localize,
+        Locale locale
+    ) {
+        return ResponseEntity.ok(localize
+            ? genreService.getAllLocalizedGenres(locale)
+            : genreService.getAllGenres());
+    }
+
+    @PatchMapping("/v1/admin/genres/{id}")
+    public ResponseEntity<GenreDto> updateById(
+        @PathVariable Long id,
+        @RequestBody GenreRequest genreRequest,
+        Locale locale
+    ) {
+        return ResponseEntity.ok(genreService.updateById(id, genreRequest, locale));
+    }
+
+    @DeleteMapping("/v1/admin/genres/{id}")
+    public ResponseEntity<?> deleteById(
+        @PathVariable Long id
+    ) {
+        genreService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
 }
