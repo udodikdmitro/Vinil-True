@@ -20,7 +20,6 @@ create table refresh_tokens (
     expiry_date timestamp(6) with time zone not null,
     user_id bigint,
     created_at timestamp(6) default CURRENT_TIMESTAMP,
-    updated_at timestamp(6) default CURRENT_TIMESTAMP,
     constraint uq_refresh_token_user_id unique(user_id),
     constraint uq_refresh_token_token unique(token),
     constraint pk_refresh_token_id primary key (id)
@@ -50,8 +49,6 @@ create table vinyl (
     artist varchar(255) not null,
     release_type varchar(255) not null,
     note text,
-    created_at timestamp(6) default CURRENT_TIMESTAMP,
-    updated_at timestamp(6) default CURRENT_TIMESTAMP,
     constraint pk_vinyl_id primary key (id)
 );
 

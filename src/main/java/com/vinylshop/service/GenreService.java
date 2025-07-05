@@ -72,7 +72,7 @@ public class GenreService {
 
     @Transactional
     public GenreDto updateById(Long id, GenreRequest genreRequest, Locale locale) throws ResourceNotFoundException {
-        Genre genre = new Genre(genreRequest.nameEn(), genreRequest.nameUk());
+        Genre genre = new Genre(null, genreRequest.nameEn(), genreRequest.nameUk());
         Genre created = updateById(id, genre);
         return genreMapper.toDto(created, locale);
     }

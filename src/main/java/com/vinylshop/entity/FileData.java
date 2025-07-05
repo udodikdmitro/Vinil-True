@@ -1,5 +1,6 @@
 package com.vinylshop.entity;
 
+import com.vinylshop.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,11 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "file_data")
-public class FileData extends BaseEntity {
+public class FileData extends BaseEntity<Long> {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "bytes", columnDefinition = "bytea not null")
     private byte[] bytes;

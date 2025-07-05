@@ -5,8 +5,6 @@ create table gift_certificates (
     is_used boolean not null,
     issued_to_id bigserial not null,
     expires_at timestamp(6) not null,
-    created_at timestamp(6) default CURRENT_TIMESTAMP,
-    updated_at timestamp(6) default CURRENT_TIMESTAMP,
     constraint pk_gift_certificates_id primary key (id)
 );
 

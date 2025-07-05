@@ -1,5 +1,6 @@
 package com.vinylshop.entity;
 
+import com.vinylshop.entity.base.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +29,11 @@ import org.hibernate.annotations.OnDeleteAction;
         )
     }
 )
-public class Review extends BaseEntity {
+public class Review extends AuditableEntity<Long> {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)

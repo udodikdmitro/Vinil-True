@@ -1,9 +1,7 @@
 package com.vinylshop.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import com.vinylshop.entity.base.AuditableEntity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +18,11 @@ import lombok.Setter;
         @UniqueConstraint(name = "uq_genres_name_en_name_uk", columnNames = {"name_en", "name_uk"})
     }
 )
-public class Genre extends BaseEntity {
+public class Genre extends AuditableEntity<Long> {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "name_en", nullable = false)
     private String nameEn;
