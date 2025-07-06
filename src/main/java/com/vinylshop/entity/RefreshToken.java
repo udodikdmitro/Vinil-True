@@ -1,5 +1,6 @@
 package com.vinylshop.entity;
 
+import com.vinylshop.entity.base.CreatableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +19,11 @@ import java.time.Instant;
                 @UniqueConstraint(name = "uq_refresh_token_token", columnNames = "token")
         }
 )
-public class RefreshToken extends BaseEntity {
+public class RefreshToken extends CreatableEntity<Long> {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String token;

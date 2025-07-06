@@ -57,7 +57,7 @@ public class FileService {
 
         for(UploadedFileAdapter file : uploadedFileAdapters) {
             try {
-                FileData fileData = new FileData(file.getBytes(), null);
+                FileData fileData = new FileData(null, file.getBytes(), null);
 
                 FileMetadata fileMetadata = fileMetadataMapper.toEntity(file);
                 fileMetadata.setFileData(fileData);

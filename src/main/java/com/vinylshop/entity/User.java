@@ -1,5 +1,6 @@
 package com.vinylshop.entity;
 
+import com.vinylshop.entity.base.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +18,11 @@ import java.util.Set;
                 @UniqueConstraint(name = "uq_users_email", columnNames = "email")
         }
 )
-public class User extends BaseEntity {
+public class User extends AuditableEntity<Long> {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String email;
