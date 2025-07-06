@@ -10,12 +10,10 @@ import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.mapper.FileMetadataMapper;
 import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.repository.VinylRepository;
-import com.vinylshop.upload.SsPictureDataUploadedFileAdapter;
+import com.vinylshop.util.ExcelUtil;
 import com.vinylshop.upload.UploadedFileAdapter;
 import com.vinylshop.util.SpecificationFactory;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ooxml.POIXMLDocumentPart;
-import org.apache.poi.ss.usermodel.PictureData;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -28,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.*;
 
 import static com.vinylshop.util.Constants.DEFAULT_CURRENCY;
@@ -87,13 +84,14 @@ public class VinylService {
             vinyl.setQuantity(1);
         }
         vinyl.setCurrency(DEFAULT_CURRENCY);
+
         vinyl.setImages(fileService.saveFilesFromUploadedFileAdapters(images));
         return vinylRepository.save(vinyl);
     }
 
     @Transactional
     public List<FileMetadataDto> addImagesFromMultipartFiles(Long id, List<MultipartFile> files) {
-        Vinyl vinyl = vinylRepository.findById(id)
+        Vinyl vinyl = findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
 
         vinyl.getImages().addAll(fileService.saveFilesFromMultipartFiles(files));
@@ -104,7 +102,7 @@ public class VinylService {
 
     @Transactional
     public List<FileMetadata> addImagesFromUploadedFileAdapters(Long id, List<UploadedFileAdapter> files) {
-        Vinyl vinyl = vinylRepository.findById(id)
+        Vinyl vinyl = findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
         vinyl.getImages().addAll(fileService.saveFilesFromUploadedFileAdapters(files));
         vinyl = vinylRepository.save(vinyl);
@@ -113,7 +111,7 @@ public class VinylService {
 
     @Transactional
     public List<FileMetadata> removeImages(Long id, List<Long> fileIds) {
-        Vinyl vinyl = vinylRepository.findById(id)
+        Vinyl vinyl = findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
 
         vinyl.getImages().removeIf(x -> fileIds.contains(x.getId()));
@@ -128,53 +126,17 @@ public class VinylService {
     public void importFromExcel(MultipartFile file) {
         try (InputStream is = file.getInputStream(); XSSFWorkbook workbook = new XSSFWorkbook(is)) {
             XSSFSheet sheet = workbook.getSheetAt(0);
-            Map<Integer, List<UploadedFileAdapter>> imageMap = extractPictureData(sheet);
+            Map<Integer, List<UploadedFileAdapter>> imageMap = ExcelUtil.extractPictureData(sheet);
 
             for (Row row : sheet) {
                 if (row.getRowNum() == 0) continue;
-                Vinyl vinyl = new Vinyl();
-                vinyl.setArtist(row.getCell(0).getStringCellValue());
-                vinyl.setAlbum(row.getCell(1).getStringCellValue());
-                vinyl.setYear((int) row.getCell(2).getNumericCellValue());
-                vinyl.setCountryOfOrigin(row.getCell(3).getStringCellValue());
-                vinyl.setCatalogCode(row.getCell(4).getStringCellValue());
-                vinyl.setLabel(row.getCell(5).getStringCellValue());
-                vinyl.setCondition(row.getCell(6).getStringCellValue());
-                vinyl.setEnvelopeCondition(row.getCell(7).getStringCellValue());
-                vinyl.setPrice(BigDecimal.valueOf(row.getCell(8).getNumericCellValue()));
-                vinyl.setNote(row.getCell(9).getStringCellValue());
+                Vinyl vinyl = ExcelUtil.getVinylFromRow(row);
                 List<UploadedFileAdapter> images = imageMap.getOrDefault(row.getRowNum(), Collections.emptyList());
                 save(vinyl, images);
             }
         } catch (IOException e) {
             throw new RuntimeException("Помилка імпорту", e);
         }
-    }
-
-    private Map<Integer, List<UploadedFileAdapter>> extractPictureData(XSSFSheet sheet) {
-        Map<Integer, List<UploadedFileAdapter>> colImageMap = new HashMap<>();
-
-        for (POIXMLDocumentPart part : sheet.getRelations()) {
-            if (part instanceof XSSFDrawing) {
-                XSSFDrawing drawing = (XSSFDrawing) part;
-                for (XSSFShape shape : drawing.getShapes()) {
-                    if (shape instanceof XSSFPicture) {
-                        XSSFPicture picture = (XSSFPicture) shape;
-                        XSSFClientAnchor anchor = picture.getPreferredSize();
-
-                        int row = anchor.getRow1();
-
-                        List<UploadedFileAdapter> colImages = colImageMap.computeIfAbsent(row, (k) -> new ArrayList<>());
-
-                        PictureData pictureData = picture.getPictureData();
-                        UploadedFileAdapter uploadedFileAdapter = new SsPictureDataUploadedFileAdapter(pictureData);
-                        colImages.add(uploadedFileAdapter);
-                    }
-                }
-            }
-        }
-
-        return colImageMap;
     }
 
     public Optional<Vinyl> findById(Long id) {

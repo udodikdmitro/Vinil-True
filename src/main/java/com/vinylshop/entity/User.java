@@ -37,4 +37,12 @@ public class User extends AuditableEntity<Long> {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    @OneToOne(
+            mappedBy = "user",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Cart cart;
+
 }

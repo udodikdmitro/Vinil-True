@@ -1,25 +1,26 @@
 package com.vinylshop.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vinylshop.entity.Role;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.math.BigDecimal;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+@AllArgsConstructor
+@Builder
+public class CartItemDto {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Set<Role> roles;
+    private ProductDto product;
 
-    private String email;
-    private String fullName;
+    private Integer quantity;
+
+    private BigDecimal totalPrice;
 
 }

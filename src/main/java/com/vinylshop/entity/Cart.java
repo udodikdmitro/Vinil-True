@@ -1,0 +1,46 @@
+package com.vinylshop.entity;
+
+import com.vinylshop.entity.base.AuditableEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(
+    name = "carts",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_carts_user_id", columnNames = "user_id")
+    }
+)
+public class Cart extends AuditableEntity<Long> {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne(
+        fetch = FetchType.LAZY,
+        optional = false
+    )
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_carts_users_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
+
+    @OneToMany(
+        mappedBy = "cart",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    private List<CartItem> items = new ArrayList<>();
+
+}
