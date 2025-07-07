@@ -10,6 +10,7 @@ public record VinylFilter(
     String album,
     BigDecimal priceFrom,
     BigDecimal priceTo,
+    Boolean onSale,
     Integer yearFrom,
     Integer yearTo,
     ReleaseType releaseType

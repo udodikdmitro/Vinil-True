@@ -6,5 +6,6 @@ public interface ProductFilter {
 
     BigDecimal priceFrom();
     BigDecimal priceTo();
+    Boolean onSale();
 
 }

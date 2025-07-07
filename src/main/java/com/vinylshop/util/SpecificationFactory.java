@@ -79,6 +79,10 @@ public final class SpecificationFactory {
                 predicates.add(cb.equal(root.get("releaseType"), filter.releaseType()));
             }
 
+            if (filter.onSale() != null && filter.onSale()) {
+                predicates.add(cb.greaterThan(root.get("discountValue"), 0));
+            }
+
             return cb.and(predicates.toArray(Predicate[]::new));
         };
     }
