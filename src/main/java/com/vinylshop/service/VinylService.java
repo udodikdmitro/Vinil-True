@@ -2,6 +2,7 @@ package com.vinylshop.service;
 
 import com.vinylshop.dto.FileMetadataDto;
 import com.vinylshop.dto.VinylDto;
+import com.vinylshop.dto.VinylUpdateRequest;
 import com.vinylshop.dto.filter.VinylFilter;
 import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Genre;
@@ -42,6 +43,7 @@ public class VinylService {
     private final VinylMapper vinylMapper;
     private final FileMetadataMapper fileMetadataMapper;
     private final GenreService genreService;
+    private final ProductService productService;
 
     public List<VinylDto> findTop10ForMainPage() {
         return vinylRepository.findTop10ByOrderByYearDesc().stream()
@@ -186,6 +188,21 @@ public class VinylService {
         Specification<Vinyl> specification = SpecificationFactory.create(filter);
         return vinylRepository.findAll(specification, pageable)
             .map(x -> vinylMapper.toLocalizeDto(x, LocaleContextHolder.getLocale()));
+    }
+
+    public Vinyl updateById(Long id, VinylUpdateRequest updateRequest) {
+        Vinyl found = vinylRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
+
+        if (updateRequest.getGenreId() != null) {
+            Genre genre = genreService.getByIdOrThrow(updateRequest.getGenreId());
+            found.setGenre(genre);
+        }
+
+        vinylMapper.updateNonNullFields(updateRequest, found);
+        productService.processDiscount(found, updateRequest);
+
+        return vinylRepository.save(found);
     }
 
 }

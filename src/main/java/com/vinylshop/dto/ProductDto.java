@@ -18,6 +18,10 @@ public class ProductDto {
 
     private BigDecimal price;
 
+    private BigDecimal discountPrice;
+
+    private BigDecimal discountValue;
+
     private Currency currency;
 
     private Integer quantity;

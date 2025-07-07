@@ -3,11 +3,13 @@ package com.vinylshop.controller;
 import com.vinylshop.dto.FileMetadataDto;
 import com.vinylshop.dto.PageDto;
 import com.vinylshop.dto.VinylDto;
+import com.vinylshop.dto.VinylUpdateRequest;
 import com.vinylshop.dto.filter.VinylFilter;
 import com.vinylshop.entity.Vinyl;
 import com.vinylshop.mapper.FileMetadataMapper;
 import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.service.VinylService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -95,5 +97,16 @@ public class VinylController {
         vinylService.importFromExcel(file);
         return ResponseEntity.ok("Імпортовано");
     }
+
+    @PatchMapping("/admin/vinyls/{id}")
+    public ResponseEntity<VinylDto> updateVinylById(
+        @PathVariable Long id,
+        @RequestBody @Valid VinylUpdateRequest request,
+        Locale locale
+    ) {
+        Vinyl updated = vinylService.updateById(id, request);
+        return ResponseEntity.ok(vinylMapper.toLocalizeDto(updated, locale));
+    }
+
 }
 
