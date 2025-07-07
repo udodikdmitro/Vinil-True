@@ -28,8 +28,14 @@ public class Product extends AuditableEntity<Long> {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal discountPrice;
+
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal discountValue = BigDecimal.ZERO;
 
     @Column(nullable = false)
     private Currency currency;
@@ -56,5 +62,9 @@ public class Product extends AuditableEntity<Long> {
         orphanRemoval = true
     )
     private List<Review> reviews = new ArrayList<>();
+
+    public BigDecimal getFinalPrice() {
+        return discountPrice == null ? price : discountPrice;
+    }
 
 }

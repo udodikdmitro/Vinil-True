@@ -29,6 +29,8 @@ create table products (
     id bigserial not null,
     title varchar(255) not null,
     price decimal(10, 2) not null,
+    discount_price decimal(10, 2),
+    discount_value decimal(5, 2) DEFAULT 0,
     currency varchar(3) not null,
     quantity integer not null,
     created_at timestamp(6) default CURRENT_TIMESTAMP,
