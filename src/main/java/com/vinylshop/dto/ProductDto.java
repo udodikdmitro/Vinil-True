@@ -35,6 +35,9 @@ public class ProductDto implements Linkable {
     private Double weight;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Long viewsCount;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<String> imageUrls = new ArrayList<>();
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -49,7 +52,7 @@ public class ProductDto implements Linkable {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Map<String, Link> _links = new HashMap<>();
 
-    public ProductDto(Long id, String title, String subtitle, BigDecimal price, Currency currency, Integer quantity, String mainImageUrl, LocalDateTime createdAt, LocalDateTime updatedAt, ProductType type) {
+    public ProductDto(Long id, String title, String subtitle, BigDecimal price, Currency currency, Integer quantity, String mainImageUrl, LocalDateTime createdAt, LocalDateTime updatedAt, ProductType type, Long viewsCount) {
         this.id = id;
         this.title = title;
         this.subtitle = subtitle;
@@ -59,6 +62,7 @@ public class ProductDto implements Linkable {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.type = type;
+        this.viewsCount = viewsCount;
         this.imageUrls.add(mainImageUrl);
     }
 

@@ -42,7 +42,8 @@ public class ProductProjectionRepositoryImpl implements ProductProjectionReposit
             root.get("mainImageUrl"),
             root.get("createdAt"),
             root.get("updatedAt"),
-            root.get("dtype")
+            root.get("dtype"),
+            root.get("viewsCount")
         )).where(predicate);
 
         query.orderBy(toOrders(pageable.getSort(), root, cb));

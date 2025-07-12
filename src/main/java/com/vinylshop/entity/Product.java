@@ -57,6 +57,9 @@ public class Product extends AuditableEntity<Long> {
     @Column
     private String mainImageUrl;
 
+    @Column(nullable = false)
+    private long viewsCount = 0;
+
     @OneToMany(
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL,
