@@ -8,6 +8,7 @@ import com.vinylshop.entity.Review;
 import com.vinylshop.entity.Vinyl;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -75,8 +76,12 @@ public final class SpecificationFactory {
                 predicates.add(cb.lessThanOrEqualTo(root.get("year"), filter.yearTo()));
             }
 
-            if (filter.releaseType() != null) {
-                predicates.add(cb.equal(root.get("releaseType"), filter.releaseType()));
+            if (filter.releaseTypes() != null && !filter.releaseTypes().isEmpty()) {
+                Path<?> releaseTypePath = root.get("releaseType");
+                Predicate[] condition = filter.releaseTypes().stream()
+                    .map(releaseType -> cb.equal(releaseTypePath, releaseType))
+                    .toArray(Predicate[]::new);
+                predicates.add(cb.or(condition));
             }
 
             if (filter.onSale() != null && filter.onSale()) {

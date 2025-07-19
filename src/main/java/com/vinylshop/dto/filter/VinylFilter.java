@@ -3,6 +3,7 @@ package com.vinylshop.dto.filter;
 import com.vinylshop.entity.ReleaseType;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public record VinylFilter(
     Long genreId,
@@ -13,5 +14,5 @@ public record VinylFilter(
     Boolean onSale,
     Integer yearFrom,
     Integer yearTo,
-    ReleaseType releaseType
+    List<ReleaseType> releaseTypes
 ) implements ProductFilter { }
