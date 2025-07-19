@@ -3,6 +3,7 @@ package com.vinylshop.controller;
 import com.vinylshop.exception.ResourceAlreadyExistException;
 import com.vinylshop.exception.ResourceException;
 import com.vinylshop.exception.ResourceNotFoundException;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.nio.file.NoSuchFileException;
 import java.util.NoSuchElementException;
@@ -63,7 +65,9 @@ public class GlobalErrorController {
 
     @ExceptionHandler({
             IllegalArgumentException.class,
-            IllegalStateException.class
+            IllegalStateException.class,
+            ConversionFailedException.class,
+            MethodArgumentTypeMismatchException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ProblemDetail handleBadRequest(Exception ex) {
