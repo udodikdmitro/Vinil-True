@@ -5,6 +5,7 @@ import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.mapper.FileMetadataMapper;
 import com.vinylshop.repository.FileDataRepository;
 import com.vinylshop.repository.FileMetadataRepository;
+import com.vinylshop.repository.FileReferenceRepository;
 import com.vinylshop.upload.MultipartFileUploadedFileAdapter;
 import com.vinylshop.upload.UploadedFileAdapter;
 import com.vinylshop.util.HashUtils;
@@ -26,6 +27,7 @@ public class FileService {
 
     private final FileMetadataRepository metadataRepository;
     private final FileDataRepository fileDataRepository;
+    private final FileReferenceRepository fileReferenceRepository;
     private final FileMetadataMapper fileMetadataMapper;
 
     @Value("${api.file-metadata.endpoint}")
@@ -120,6 +122,13 @@ public class FileService {
     @Transactional
     public void deleteFiles(List<Long> ids) {
         fileDataRepository.deleteAllByIdInBatch(ids);
+    }
+
+    @Transactional
+    public void deleteReferenceToProduct(Long productId, Collection<Long> fileIds) {
+        if (fileIds != null && !fileIds.isEmpty()) {
+            fileReferenceRepository.deleteByProductIdAndFileIdIn(productId, fileIds);
+        }
     }
 
 }
