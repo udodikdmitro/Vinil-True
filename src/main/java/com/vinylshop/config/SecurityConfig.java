@@ -36,6 +36,8 @@ public class SecurityConfig {
                             "/api/v1/genres",
                             "/api/v1/genres/**",
                             "/api/v1/vinyls/**",
+                            "/api/v1/products",
+                            "/api/v1/products/**",
                             "/api/v1/products/reviews",
                             "/api/v1/products/reviews/**"
                         ).permitAll()

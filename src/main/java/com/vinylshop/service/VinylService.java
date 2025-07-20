@@ -1,14 +1,10 @@
 package com.vinylshop.service;
 
-import com.vinylshop.dto.FileMetadataDto;
 import com.vinylshop.dto.VinylDto;
 import com.vinylshop.dto.VinylUpdateRequest;
 import com.vinylshop.dto.filter.VinylFilter;
-import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Genre;
 import com.vinylshop.entity.Vinyl;
-import com.vinylshop.exception.ResourceNotFoundException;
-import com.vinylshop.mapper.FileMetadataMapper;
 import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.repository.VinylRepository;
 import com.vinylshop.upload.SsPictureDataUploadedFileAdapter;
@@ -41,7 +37,6 @@ public class VinylService {
     private final VinylRepository vinylRepository;
     private final FileService fileService;
     private final VinylMapper vinylMapper;
-    private final FileMetadataMapper fileMetadataMapper;
     private final GenreService genreService;
     private final ProductService productService;
 
@@ -91,39 +86,6 @@ public class VinylService {
         vinyl.setCurrency(DEFAULT_CURRENCY);
         vinyl.setImages(fileService.saveFilesFromUploadedFileAdapters(images));
         return vinylRepository.save(vinyl);
-    }
-
-    @Transactional
-    public List<FileMetadataDto> addImagesFromMultipartFiles(Long id, List<MultipartFile> files) {
-        Vinyl vinyl = vinylRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
-
-        vinyl.getImages().addAll(fileService.saveFilesFromMultipartFiles(files));
-        vinyl = vinylRepository.save(vinyl);
-
-        return fileMetadataMapper.toDtoAll(vinyl.getImages()).toList();
-    }
-
-    @Transactional
-    public List<FileMetadata> addImagesFromUploadedFileAdapters(Long id, List<UploadedFileAdapter> files) {
-        Vinyl vinyl = vinylRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
-        vinyl.getImages().addAll(fileService.saveFilesFromUploadedFileAdapters(files));
-        vinyl = vinylRepository.save(vinyl);
-        return vinyl.getImages();
-    }
-
-    @Transactional
-    public List<FileMetadata> removeImages(Long id, List<Long> fileIds) {
-        Vinyl vinyl = vinylRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
-
-        vinyl.getImages().removeIf(x -> fileIds.contains(x.getId()));
-
-        fileService.deleteFiles(fileIds);
-
-        vinyl = vinylRepository.save(vinyl);
-        return vinyl.getImages();
     }
 
     @Transactional
@@ -179,6 +141,7 @@ public class VinylService {
         return colImageMap;
     }
 
+    @Transactional(readOnly = true)
     public Optional<Vinyl> findById(Long id) {
         return vinylRepository.findById(id);
     }

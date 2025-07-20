@@ -57,9 +57,9 @@ create table vinyl (
 alter table user_roles
 add constraint fk_user_roles_users_id
 foreign key (user_id) references users(id)
-MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE;
 
 alter table vinyl
 add constraint fk_vinyl_products_id
 FOREIGN KEY (id) REFERENCES products(id)
-MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE;

@@ -12,7 +12,12 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "file_metadatas")
+@Table(
+    name = "file_metadatas",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_file_metadatas_hash", columnNames = "hash")
+    }
+)
 public class FileMetadata extends AuditableEntity<Long> {
 
     @Id
@@ -38,14 +43,18 @@ public class FileMetadata extends AuditableEntity<Long> {
     @Column(nullable = false)
     private long size;
 
+    @Column(nullable = false, length = 40)
+    private String hash;
+
     @OneToOne(
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY,
             orphanRemoval = true,
             optional = false
     )
+    @MapsId
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "file_data_id", foreignKey = @ForeignKey(name = "fk_file_metadatas_file_data"))
+    @JoinColumn(name = "id", foreignKey = @ForeignKey(name = "fk_file_metadatas_file_data"))
     private FileData fileData;
 
 }

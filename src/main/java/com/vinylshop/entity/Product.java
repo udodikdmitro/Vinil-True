@@ -51,7 +51,10 @@ public class Product extends AuditableEntity<Long> {
     @JoinTable(
         name = "files_references",
         joinColumns = @JoinColumn(name = "product_id", foreignKey = @ForeignKey(name = "fk_files_references_products")),
-        inverseJoinColumns = @JoinColumn(name = "file_metadata_id", foreignKey = @ForeignKey(name = "fk_files_references_file_metadatas"))
+        inverseJoinColumns = @JoinColumn(name = "file_id", foreignKey = @ForeignKey(name = "fk_files_references_file_data")),
+        uniqueConstraints = {
+            @UniqueConstraint(name = "uq_files_references_product_id", columnNames = {"file_id", "product_id"})
+        }
     )
     private List<FileMetadata> images = new ArrayList<>();
 
