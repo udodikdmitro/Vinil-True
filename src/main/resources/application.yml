@@ -3,6 +3,13 @@ spring:
     url: jdbc:postgresql://localhost:5432/vinylstore
     username: your_user
     password: your_password
+  web:
+    locale: uk
+  messages:
+    basename: i18n/messages,i18n/errors
+    encoding: 'UTF-8'
+    fallback-to-system-locale: false
+    cache-duration: 1d
   flyway:
     enabled: true
   jpa:
