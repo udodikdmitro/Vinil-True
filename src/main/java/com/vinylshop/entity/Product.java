@@ -43,6 +43,9 @@ public class Product extends AuditableEntity<Long> {
     @Column(nullable = false)
     private int quantity = 0;
 
+    @Column
+    private Double weight;
+
     @OneToMany(
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL,

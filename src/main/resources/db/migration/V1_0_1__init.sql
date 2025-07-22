@@ -33,6 +33,7 @@ create table products (
     discount_value decimal(5, 2) DEFAULT 0,
     currency varchar(3) not null,
     quantity integer not null,
+    weight float(53),
     created_at timestamp(6) default CURRENT_TIMESTAMP,
     updated_at timestamp(6) default CURRENT_TIMESTAMP,
     constraint pk_products_id primary key (id)
@@ -51,6 +52,15 @@ create table vinyl (
     artist varchar(255) not null,
     release_type varchar(255) not null,
     note text,
+    format varchar(255),
+    color varchar(255),
+    vinyl_size float(53),
+    limited_edition_number varchar(255),
+    is_embossing boolean,
+    total_pressing integer,
+    speed float(53),
+    disc_count integer,
+    external_album_id bigint,
     constraint pk_vinyl_id primary key (id)
 );
 
