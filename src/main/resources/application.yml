@@ -25,3 +25,5 @@ spring:
 api:
   file-metadata:
     endpoint: '/api/v1/files/{id}'
+  deezer:
+    base-url: 'https://api.deezer.com'

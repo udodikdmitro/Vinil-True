@@ -1,12 +1,15 @@
 package com.vinylshop.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.vinylshop.dto.VinylDto;
 import com.vinylshop.dto.VinylUpdateRequest;
 import com.vinylshop.dto.filter.VinylFilter;
 import com.vinylshop.entity.Genre;
 import com.vinylshop.entity.Vinyl;
+import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.repository.VinylRepository;
+import com.vinylshop.upload.MultipartFileUploadedFileAdapter;
 import com.vinylshop.upload.SsPictureDataUploadedFileAdapter;
 import com.vinylshop.upload.UploadedFileAdapter;
 import com.vinylshop.util.SpecificationFactory;
@@ -39,6 +42,7 @@ public class VinylService {
     private final VinylMapper vinylMapper;
     private final GenreService genreService;
     private final ProductService productService;
+    private final DeezerService deezerService;
 
     public List<VinylDto> findTop10ForMainPage() {
         return vinylRepository.findTop10ByOrderByYearDesc().stream()
@@ -49,26 +53,15 @@ public class VinylService {
     @Transactional
     public VinylDto saveFromDto(VinylDto dto, Collection<MultipartFile> files) {
         Vinyl vinyl = vinylMapper.toEntity(dto);
+        vinyl.setGenre(new Genre(dto.getGenre().id(), null, null));
 
-        if (dto.getGenre() != null && dto.getGenre().id() != null) {
-            Genre genre = genreService.getByIdOrThrow(dto.getGenre().id());
-            vinyl.setGenre(genre);
-        }
-        if (vinyl.getTitle() == null) {
-            vinyl.setTitle(vinyl.getAlbum());
-        }
-        if (dto.getQuantity() == null) {
-            vinyl.setQuantity(1);
-        }
-        vinyl.setCurrency(DEFAULT_CURRENCY);
+        List<UploadedFileAdapter> uploadedFileAdapters = files.stream()
+            .map(file -> (UploadedFileAdapter) new MultipartFileUploadedFileAdapter(file))
+            .toList();
 
-        if (files != null && !files.isEmpty()) {
-            vinyl.setImages(fileService.saveFilesFromMultipartFiles(files));
-        }
+        Vinyl created = save(vinyl, uploadedFileAdapters);
 
-        vinyl = vinylRepository.save(vinyl);
-
-        return vinylMapper.toLocalizeDto(vinyl, LocaleContextHolder.getLocale());
+        return vinylMapper.toLocalizeDto(created, LocaleContextHolder.getLocale());
     }
 
     @Transactional
@@ -82,6 +75,18 @@ public class VinylService {
         }
         if (vinyl.getQuantity() == 0) {
             vinyl.setQuantity(1);
+        }
+        if (vinyl.getExternalAlbumId() != null) {
+            Optional<JsonNode> albumObjectOpt = deezerService.getAlbumObjectById(vinyl.getExternalAlbumId());
+            if (albumObjectOpt.isPresent()) {
+                vinyl.setExternalAlbumId(vinyl.getExternalAlbumId());
+            }
+        }
+        if (vinyl.getExternalAlbumId() == null) {
+            deezerService.getAlbumObjectByAlbumAndArtist(vinyl.getAlbum(), vinyl.getArtist())
+                .flatMap(x -> Optional.ofNullable(x.get("id")))
+                .map(JsonNode::asLong)
+                .ifPresent(vinyl::setExternalAlbumId);
         }
         vinyl.setCurrency(DEFAULT_CURRENCY);
         vinyl.setImages(fileService.saveFilesFromUploadedFileAdapters(images));
@@ -153,6 +158,7 @@ public class VinylService {
             .map(x -> vinylMapper.toLocalizeDto(x, LocaleContextHolder.getLocale()));
     }
 
+    @Transactional
     public Vinyl updateById(Long id, VinylUpdateRequest updateRequest) {
         Vinyl found = vinylRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("vinyl not found", id, "Vinyl"));
