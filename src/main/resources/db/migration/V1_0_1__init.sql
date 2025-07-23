@@ -34,6 +34,7 @@ create table products (
     currency varchar(3) not null,
     quantity integer not null,
     weight float(53),
+    main_image_url varchar(255),
     created_at timestamp(6) default CURRENT_TIMESTAMP,
     updated_at timestamp(6) default CURRENT_TIMESTAMP,
     constraint pk_products_id primary key (id)

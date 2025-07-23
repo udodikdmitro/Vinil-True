@@ -89,7 +89,13 @@ public class VinylService {
                 .ifPresent(vinyl::setExternalAlbumId);
         }
         vinyl.setCurrency(DEFAULT_CURRENCY);
-        vinyl.setImages(fileService.saveFilesFromUploadedFileAdapters(images));
+
+        if (images != null && !images.isEmpty()) {
+            List<FileMetadata> savedImages = fileService.saveFilesFromUploadedFileAdapters(images);
+            vinyl.setImages(savedImages);
+            vinyl.setMainImageUrl(savedImages.get(0).getContentUrl());
+        }
+
         return vinylRepository.save(vinyl);
     }
 

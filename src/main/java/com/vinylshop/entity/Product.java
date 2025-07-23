@@ -46,6 +46,9 @@ public class Product extends AuditableEntity<Long> {
     @Column
     private Double weight;
 
+    @Column
+    private String mainImageUrl;
+
     @OneToMany(
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL,

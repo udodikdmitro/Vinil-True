@@ -29,6 +29,9 @@ public class ProductDto {
     private Double weight;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String mainImageUrl;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<String> imageUrls;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
