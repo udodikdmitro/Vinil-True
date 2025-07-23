@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.vinylshop.dto.VinylDto;
 import com.vinylshop.dto.VinylUpdateRequest;
 import com.vinylshop.dto.filter.VinylFilter;
+import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Genre;
 import com.vinylshop.entity.Vinyl;
 import com.vinylshop.exception.ResourceNotFoundException;
@@ -72,6 +73,9 @@ public class VinylService {
         }
         if (vinyl.getTitle() == null) {
             vinyl.setTitle(vinyl.getAlbum());
+        }
+        if (vinyl.getSubtitle() == null) {
+            vinyl.setSubtitle(vinyl.getArtist());
         }
         if (vinyl.getQuantity() == 0) {
             vinyl.setQuantity(1);

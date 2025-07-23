@@ -16,7 +16,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@DiscriminatorValue("vinyl")
+@DiscriminatorValue("VINYL")
 public class Vinyl extends Product {
 
     @Column(nullable = false)

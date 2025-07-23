@@ -3,8 +3,8 @@ package com.vinylshop.controller;
 import com.vinylshop.dto.PageDto;
 import com.vinylshop.dto.VinylDto;
 import com.vinylshop.dto.VinylUpdateRequest;
-import com.vinylshop.dto.filter.VinylFilter;
 import com.vinylshop.entity.Vinyl;
+import com.vinylshop.dto.filter.VinylFilterImpl;
 import com.vinylshop.mapper.VinylMapper;
 import com.vinylshop.service.VinylService;
 import jakarta.validation.Valid;
@@ -30,9 +30,9 @@ public class VinylController {
     private final VinylService vinylService;
     private final VinylMapper vinylMapper;
 
-    @GetMapping("/vinyls")
+    @GetMapping("/admin/vinyls")
     public ResponseEntity<PageDto<VinylDto>> getAll(
-        @ModelAttribute VinylFilter filter,
+        @ModelAttribute VinylFilterImpl filter,
         @PageableDefault(page = 0, size = 10) Pageable pageable
     ) {
         Page<VinylDto> vinylPage = vinylService.findAll(filter, pageable);

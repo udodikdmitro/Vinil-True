@@ -3,6 +3,10 @@ package com.vinylshop.service;
 import com.vinylshop.dto.ProductUpdateRequest;
 import com.vinylshop.dto.FileMetadataDto;
 import com.vinylshop.entity.FileMetadata;
+import com.vinylshop.dto.PageDto;
+import com.vinylshop.dto.ProductDto;
+import com.vinylshop.dto.SearchResponse;
+import com.vinylshop.dto.filter.*;
 import com.vinylshop.entity.Product;
 import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.mapper.FileMetadataMapper;
@@ -10,8 +14,13 @@ import com.vinylshop.repository.ProductRepository;
 import com.vinylshop.upload.MultipartFileUploadedFileAdapter;
 import com.vinylshop.upload.UploadedFileAdapter;
 import com.vinylshop.util.HashUtils;
+import com.vinylshop.repository.ProductProjectionRepository;
+import com.vinylshop.util.SpecificationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,11 +43,30 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final FileService fileService;
     private final FileMetadataMapper fileMetadataMapper;
+    private final ProductProjectionRepository productProjectionRepository;
 
     @Transactional(readOnly = true)
     public Product getByIdOrThrow(Long id) {
         return productRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Product " + id + " not found", id, "Product"));
+    }
+
+    @Transactional(readOnly = true)
+    public SearchResponse search(GlobalProductFilter filter, Pageable pageable) {
+        VinylFilter vinylFilter = VinylFilterImpl.from(filter);
+        PageDto<ProductDto> vinylPageDto = searchProducts(vinylFilter, pageable);
+
+        GiftCertificateFilter giftCertificateFilter = GiftCertificateFilterImpl.from(filter);
+        PageDto<ProductDto> giftCertificatePageDto = searchProducts(giftCertificateFilter, pageable);
+
+        return new SearchResponse(vinylPageDto, giftCertificatePageDto);
+    }
+
+    @Transactional(readOnly = true)
+    public PageDto<ProductDto> searchProducts(ProductFilter filter, Pageable pageable) {
+        Specification<Product> spec = SpecificationFactory.createForProduct(filter);
+        Page<ProductDto> page = productProjectionRepository.findAllProjected(spec, pageable);
+        return new PageDto<>(page);
     }
 
     @Transactional

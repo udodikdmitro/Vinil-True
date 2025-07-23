@@ -1,6 +1,7 @@
 package com.vinylshop.config;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import com.vinylshop.entity.ProductType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +30,9 @@ public class WebConfig implements WebMvcConfigurer {
         return new ConverterFactory<>() {
             @Override
             public <T extends Enum<?>> Converter<String, T> getConverter(Class<T> targetType) {
+                if (targetType == ProductType.class) {
+                    return (Converter<String, T>) stringToProductType();
+                }
                 return source -> {
                     if (!source.isBlank()) {
                         String value = source.trim();
@@ -43,7 +47,27 @@ public class WebConfig implements WebMvcConfigurer {
                         TypeDescriptor.valueOf(targetType),
                         source,
                         new IllegalArgumentException("Unknown enum value: " + source)
-                    );                };
+                    );
+                };
+            }
+        };
+    }
+
+    @Bean
+    public Converter<String, ProductType> stringToProductType() {
+        return new Converter<String, ProductType>() {
+            @Override
+            public ProductType convert(String source) {
+                try {
+                    return ProductType.fromValue(source);
+                } catch (Exception ex) {
+                    throw new ConversionFailedException(
+                        TypeDescriptor.valueOf(String.class),
+                        TypeDescriptor.valueOf(ProductType.class),
+                        source,
+                        new IllegalArgumentException("Unknown enum value: " + source)
+                    );
+                }
             }
         };
     }

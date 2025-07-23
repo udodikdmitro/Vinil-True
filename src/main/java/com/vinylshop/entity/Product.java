@@ -27,7 +27,8 @@ public class Product extends AuditableEntity<Long> {
     private Long id;
 
     @Column(name = "DTYPE", insertable = false, updatable = false)
-    private String dtype;
+    @Enumerated(EnumType.STRING)
+    private ProductType dtype;
 
     @Column(nullable = false)
     private String title;
