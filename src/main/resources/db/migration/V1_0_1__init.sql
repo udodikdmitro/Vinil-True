@@ -28,6 +28,7 @@ create table refresh_tokens (
 create table products (
     id bigserial not null,
     title varchar(255) not null,
+    subtitle varchar(255),
     price decimal(10, 2) not null,
     discount_price decimal(10, 2),
     discount_value decimal(5, 2) DEFAULT 0,
@@ -35,6 +36,7 @@ create table products (
     quantity integer not null,
     weight float(53),
     main_image_url varchar(255),
+    DTYPE varchar(31),
     created_at timestamp(6) default CURRENT_TIMESTAMP,
     updated_at timestamp(6) default CURRENT_TIMESTAMP,
     constraint pk_products_id primary key (id)

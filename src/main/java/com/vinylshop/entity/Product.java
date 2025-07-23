@@ -19,14 +19,21 @@ import java.util.List;
 @Entity
 @Table(name = "products")
 @Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn
 public class Product extends AuditableEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "DTYPE", insertable = false, updatable = false)
+    private String dtype;
+
     @Column(nullable = false)
     private String title;
+
+    @Column
+    private String subtitle;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
