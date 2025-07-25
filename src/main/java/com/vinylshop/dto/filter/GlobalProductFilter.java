@@ -23,6 +23,7 @@ public class GlobalProductFilter implements GiftCertificateFilter, VinylFilter {
     private Integer yearTo;
     private List<ReleaseType> releaseTypes;
     private ProductType type;
+    private Boolean popularFirst;
 
     @Override
     public String search() {
@@ -112,6 +113,15 @@ public class GlobalProductFilter implements GiftCertificateFilter, VinylFilter {
 
     public void type(ProductType type) {
         this.type = type;
+    }
+
+    @Override
+    public Boolean popularFirst() {
+        return popularFirst;
+    }
+
+    public void popularFirst(Boolean popularFirst) {
+        this.popularFirst = popularFirst;
     }
 
 }

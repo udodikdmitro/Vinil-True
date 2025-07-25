@@ -22,7 +22,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -165,8 +167,16 @@ public class VinylService {
 
     @Transactional(readOnly = true)
     public Page<VinylDto> findAll(VinylFilter filter, Pageable pageable) {
+        Pageable tPageable = pageable;
+        if (filter.popularFirst() != null && filter.popularFirst()) {
+            Sort sort = Sort.by(Sort.Direction.DESC, "viewsCount")
+                .and(pageable.getSort());
+            tPageable = PageRequest.of(pageable.getPageNumber(),
+                pageable.getPageSize(), sort);
+        }
+
         Specification<Vinyl> specification = SpecificationFactory.create(filter);
-        return vinylRepository.findAll(specification, pageable)
+        return vinylRepository.findAll(specification, tPageable)
             .map(x -> vinylMapper.toLocalizeDto(x, LocaleContextHolder.getLocale()));
     }
 

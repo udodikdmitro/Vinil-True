@@ -11,5 +11,6 @@ public interface ProductFilter {
     BigDecimal priceTo();
     Boolean onSale();
     ProductType type();
+    Boolean popularFirst();
 
 }

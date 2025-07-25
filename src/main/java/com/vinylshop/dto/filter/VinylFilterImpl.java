@@ -16,11 +16,12 @@ public record VinylFilterImpl(
     Boolean onSale,
     Integer yearFrom,
     Integer yearTo,
-    List<ReleaseType> releaseTypes
+    List<ReleaseType> releaseTypes,
+    Boolean popularFirst
 ) implements VinylFilter {
 
     public static VinylFilter from(VinylFilter other) {
-        return new VinylFilterImpl(other.search(), other.genreId(), other.artist(), other.album(), other.priceFrom(), other.priceTo(), other.onSale(), other.yearFrom(), other.yearTo(), other.releaseTypes());
+        return new VinylFilterImpl(other.search(), other.genreId(), other.artist(), other.album(), other.priceFrom(), other.priceTo(), other.onSale(), other.yearFrom(), other.yearTo(), other.releaseTypes(), other.popularFirst());
     }
 
 }

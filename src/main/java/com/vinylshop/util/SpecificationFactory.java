@@ -141,6 +141,10 @@ public final class SpecificationFactory {
             predicates.add(cb.equal(root.get("dtype"), filter.type()));
         }
 
+        if (filter.popularFirst() != null) {
+
+        }
+
         if (filter.priceTo() != null && filter.priceFrom() != null) {
             predicates.add(cb.between(root.get("price"), filter.priceFrom(), filter.priceTo()));
         } else if (filter.priceFrom() != null) {

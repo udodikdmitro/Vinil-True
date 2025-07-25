@@ -5,11 +5,12 @@ import java.math.BigDecimal;
 public record GiftCertificateFilterImpl(
     String search,
     BigDecimal priceFrom,
-    BigDecimal priceTo
+    BigDecimal priceTo,
+    Boolean popularFirst
 ) implements GiftCertificateFilter {
 
     public static GiftCertificateFilter from(GiftCertificateFilter other) {
-        return new GiftCertificateFilterImpl(other.search(), other.priceFrom(), other.priceTo());
+        return new GiftCertificateFilterImpl(other.search(), other.priceFrom(), other.priceTo(), other.popularFirst());
     }
 
 }

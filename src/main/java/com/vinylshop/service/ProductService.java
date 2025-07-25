@@ -18,8 +18,11 @@ import com.vinylshop.repository.ProductProjectionRepository;
 import com.vinylshop.util.SpecificationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.query.Order;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,8 +67,16 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public PageDto<ProductDto> searchProducts(ProductFilter filter, Pageable pageable) {
+        Pageable tPageable = pageable;
+        if (filter.popularFirst() != null && filter.popularFirst()) {
+            Sort sort = Sort.by(Sort.Direction.DESC, "viewsCount")
+                .and(pageable.getSort());
+            tPageable = PageRequest.of(pageable.getPageNumber(),
+                pageable.getPageSize(), sort);
+        }
+
         Specification<Product> spec = SpecificationFactory.createForProduct(filter);
-        Page<ProductDto> page = productProjectionRepository.findAllProjected(spec, pageable);
+        Page<ProductDto> page = productProjectionRepository.findAllProjected(spec, tPageable);
         return new PageDto<>(page);
     }
 
