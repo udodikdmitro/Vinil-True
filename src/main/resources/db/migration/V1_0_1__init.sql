@@ -37,10 +37,12 @@ create table products (
     weight float(53),
     main_image_url varchar(255),
     DTYPE varchar(31),
+    barcode varchar(255),
     views_count bigint not null default 0,
     created_at timestamp(6) default CURRENT_TIMESTAMP,
     updated_at timestamp(6) default CURRENT_TIMESTAMP,
-    constraint pk_products_id primary key (id)
+    constraint pk_products_id primary key (id),
+    constraint uq_products_barcode unique (barcode)
 );
 
 create table vinyl (

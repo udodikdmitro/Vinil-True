@@ -34,6 +34,8 @@ public class ProductDto implements Linkable {
 
     private Double weight;
 
+    private String barcode;
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long viewsCount;
 

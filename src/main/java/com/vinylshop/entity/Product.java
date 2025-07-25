@@ -17,7 +17,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "products")
+@Table(
+    name = "products",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_products_barcode", columnNames = "barcode")
+    }
+)
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn
 public class Product extends AuditableEntity<Long> {
@@ -59,6 +64,9 @@ public class Product extends AuditableEntity<Long> {
 
     @Column(nullable = false)
     private long viewsCount = 0;
+
+    @Column
+    private String barcode;
 
     @OneToMany(
         fetch = FetchType.EAGER,

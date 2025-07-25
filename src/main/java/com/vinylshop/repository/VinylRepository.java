@@ -7,11 +7,15 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Репозиторій для управління платівками
  */
 @Repository
 public interface VinylRepository extends JpaRepository<Vinyl, Long>, JpaSpecificationExecutor<Vinyl> {
+
     Collection<Vinyl> findTop10ByOrderByYearDesc();
+    Optional<Vinyl> findByBarcode(String barcode);
+
 }

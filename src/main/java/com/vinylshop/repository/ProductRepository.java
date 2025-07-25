@@ -6,11 +6,15 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Modifying
     @Query("UPDATE Product p SET p.viewsCount = p.viewsCount + 1 WHERE p.id = :productId")
     void incrementViewsCount(Long productId);
+
+    Optional<Product> findByBarcode(String barcode);
 
 }
