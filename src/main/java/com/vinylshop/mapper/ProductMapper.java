@@ -3,10 +3,7 @@ package com.vinylshop.mapper;
 import com.vinylshop.dto.ProductDto;
 import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Product;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -14,7 +11,8 @@ import java.util.List;
 public interface ProductMapper {
 
     @Mappings({
-        @Mapping(target = "imageUrls", ignore = true)
+        @Mapping(target = "imageUrls", ignore = true),
+        @Mapping(target = "_links", ignore = true)
     })
     ProductDto toDto(Product entity);
 

@@ -8,14 +8,12 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Currency;
-import java.util.List;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDto {
+public class ProductDto implements Linkable {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
@@ -47,6 +45,9 @@ public class ProductDto {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private ProductType type;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Map<String, Link> _links = new HashMap<>();
 
     public ProductDto(Long id, String title, String subtitle, BigDecimal price, Currency currency, Integer quantity, String mainImageUrl, LocalDateTime createdAt, LocalDateTime updatedAt, ProductType type) {
         this.id = id;
