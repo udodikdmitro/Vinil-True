@@ -32,7 +32,7 @@ public class ProductController {
     private final ProductService productService;
     private final FileMetadataMapper fileMetadataMapper;
 
-    @GetMapping("/products")
+    @GetMapping("/search")
     public ResponseEntity<SearchResponse> search(
         @ModelAttribute GlobalProductFilter filter,
         @PageableDefault(page = 0, size = 10) Pageable pageable
@@ -40,7 +40,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.search(filter, pageable));
     }
 
-    @GetMapping("/products/vinyls")
+    @GetMapping("/search/vinyls")
     public ResponseEntity<PageDto<ProductDto>> searchVinyls(
         @ModelAttribute VinylFilterImpl filter,
         @PageableDefault(page = 0, size = 10) Pageable pageable
@@ -48,7 +48,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.searchProducts(filter, pageable));
     }
 
-    @GetMapping("/products/gift-certificates")
+    @GetMapping("/search/gift-certificates")
     public ResponseEntity<PageDto<ProductDto>> searchGiftCertificates(
         @ModelAttribute GiftCertificateFilterImpl filter,
         @PageableDefault(page = 0, size = 10) Pageable pageable
