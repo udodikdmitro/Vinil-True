@@ -6,6 +6,7 @@ import com.vinylshop.dto.VinylUpdateRequest;
 import com.vinylshop.dto.filter.VinylFilter;
 import com.vinylshop.entity.FileMetadata;
 import com.vinylshop.entity.Genre;
+import com.vinylshop.entity.ProductType;
 import com.vinylshop.entity.Vinyl;
 import com.vinylshop.exception.ResourceNotFoundException;
 import com.vinylshop.mapper.VinylMapper;
@@ -92,6 +93,7 @@ public class VinylService {
                 .map(JsonNode::asLong)
                 .ifPresent(vinyl::setExternalAlbumId);
         }
+        vinyl.setDtype(ProductType.VINYL);
         vinyl.setCurrency(DEFAULT_CURRENCY);
 
         if (images != null && !images.isEmpty()) {

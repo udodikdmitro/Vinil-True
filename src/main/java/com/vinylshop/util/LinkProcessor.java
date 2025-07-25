@@ -41,17 +41,15 @@ public class LinkProcessor {
     }
 
     public String getSelfLink(Linkable linkable, UriComponentsBuilder baseBuilder) {
-        return switch (linkable) {
-            case ProductDto productDto -> {
-                UriComponentsBuilder resourceUriBuilder = switch (productDto.getType()) {
-                    case VINYL -> baseBuilder.cloneBuilder().path("/vinyls");
-                    case GIFT_CERTIFICATE -> baseBuilder.cloneBuilder().path("/gift-certificates");
-                };
-                resourceUriBuilder.path("/{id}");
-                yield resourceUriBuilder.buildAndExpand(productDto.getId()).toUriString();
-            }
-            default -> null;
-        };
+        if (linkable instanceof ProductDto productDto) {
+            UriComponentsBuilder resourceUriBuilder = switch (productDto.getType()) {
+                case VINYL -> baseBuilder.cloneBuilder().path("/vinyls");
+                case GIFT_CERTIFICATE -> baseBuilder.cloneBuilder().path("/gift-certificates");
+            };
+            resourceUriBuilder.path("/{id}");
+            return resourceUriBuilder.buildAndExpand(productDto.getId()).toUriString();
+        }
+        return null;
     }
 
     private void putLink(Map<String, Link> _links, String name, String link) {
