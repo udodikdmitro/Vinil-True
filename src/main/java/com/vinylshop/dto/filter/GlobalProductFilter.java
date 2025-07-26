@@ -19,6 +19,7 @@ public class GlobalProductFilter implements GiftCertificateFilter, VinylFilter {
     private String album;
     private BigDecimal priceFrom;
     private BigDecimal priceTo;
+    private Boolean onSale;
     private Integer yearFrom;
     private Integer yearTo;
     private List<ReleaseType> releaseTypes;
@@ -73,6 +74,15 @@ public class GlobalProductFilter implements GiftCertificateFilter, VinylFilter {
     @Override
     public BigDecimal priceTo() {
         return priceTo;
+    }
+
+    @Override
+    public Boolean onSale() {
+        return onSale;
+    }
+
+    public void onSale(Boolean onSale) {
+        this.onSale = onSale;
     }
 
     public void priceTo(BigDecimal priceTo) {
