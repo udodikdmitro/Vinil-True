@@ -17,25 +17,56 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "products")
+@Table(
+    name = "products",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_products_barcode", columnNames = "barcode")
+    }
+)
 @Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn
 public class Product extends AuditableEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "DTYPE", insertable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
+    private ProductType dtype;
+
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column
+    private String subtitle;
+
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal discountPrice;
+
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal discountValue = BigDecimal.ZERO;
 
     @Column(nullable = false)
     private Currency currency;
 
     @Column(nullable = false)
     private int quantity = 0;
+
+    @Column
+    private Double weight;
+
+    @Column
+    private String mainImageUrl;
+
+    @Column(nullable = false)
+    private long viewsCount = 0;
+
+    @Column
+    private String barcode;
 
     @OneToMany(
         fetch = FetchType.EAGER,
@@ -45,7 +76,10 @@ public class Product extends AuditableEntity<Long> {
     @JoinTable(
         name = "files_references",
         joinColumns = @JoinColumn(name = "product_id", foreignKey = @ForeignKey(name = "fk_files_references_products")),
-        inverseJoinColumns = @JoinColumn(name = "file_metadata_id", foreignKey = @ForeignKey(name = "fk_files_references_file_metadatas"))
+        inverseJoinColumns = @JoinColumn(name = "file_id", foreignKey = @ForeignKey(name = "fk_files_references_file_data")),
+        uniqueConstraints = {
+            @UniqueConstraint(name = "uq_files_references_product_id", columnNames = {"file_id", "product_id"})
+        }
     )
     private List<FileMetadata> images = new ArrayList<>();
 
@@ -56,5 +90,9 @@ public class Product extends AuditableEntity<Long> {
         orphanRemoval = true
     )
     private List<Review> reviews = new ArrayList<>();
+
+    public BigDecimal getFinalPrice() {
+        return discountPrice == null ? price : discountPrice;
+    }
 
 }

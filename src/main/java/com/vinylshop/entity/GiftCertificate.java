@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
         @UniqueConstraint(name = "uq_gift_certificates_code", columnNames = "code")
     }
 )
+@DiscriminatorValue("GIFT_CERTIFICATE")
 public class GiftCertificate extends Product {
 
     // TODO: визначити формат і як генерувати

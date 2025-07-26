@@ -16,6 +16,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@DiscriminatorValue("VINYL")
 public class Vinyl extends Product {
 
     @Column(nullable = false)
@@ -51,5 +52,34 @@ public class Vinyl extends Product {
 
     @Enumerated(EnumType.STRING)
     private ReleaseType releaseType;
+
+    @Column
+    private String format;
+
+    @Column
+    private String color;
+
+    // діаметр платівки в дюймах
+    @Column
+    private Double vinylSize;
+
+    @Column
+    private String limitedEditionNumber;
+
+    @Column
+    private Boolean isEmbossing;
+
+    @Column
+    private Integer totalPressing;
+
+    // швидкість обертання RPM
+    @Column
+    private Double speed;
+
+    @Column
+    private Integer discCount;
+
+    @Column
+    private Long externalAlbumId;
 
 }

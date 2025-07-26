@@ -28,12 +28,21 @@ create table refresh_tokens (
 create table products (
     id bigserial not null,
     title varchar(255) not null,
+    subtitle varchar(255),
     price decimal(10, 2) not null,
+    discount_price decimal(10, 2),
+    discount_value decimal(5, 2) DEFAULT 0,
     currency varchar(3) not null,
     quantity integer not null,
+    weight float(53),
+    main_image_url varchar(255),
+    DTYPE varchar(31),
+    barcode varchar(255),
+    views_count bigint not null default 0,
     created_at timestamp(6) default CURRENT_TIMESTAMP,
     updated_at timestamp(6) default CURRENT_TIMESTAMP,
-    constraint pk_products_id primary key (id)
+    constraint pk_products_id primary key (id),
+    constraint uq_products_barcode unique (barcode)
 );
 
 create table vinyl (
@@ -49,15 +58,24 @@ create table vinyl (
     artist varchar(255) not null,
     release_type varchar(255) not null,
     note text,
+    format varchar(255),
+    color varchar(255),
+    vinyl_size float(53),
+    limited_edition_number varchar(255),
+    is_embossing boolean,
+    total_pressing integer,
+    speed float(53),
+    disc_count integer,
+    external_album_id bigint,
     constraint pk_vinyl_id primary key (id)
 );
 
 alter table user_roles
 add constraint fk_user_roles_users_id
 foreign key (user_id) references users(id)
-MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE;
 
 alter table vinyl
 add constraint fk_vinyl_products_id
 FOREIGN KEY (id) REFERENCES products(id)
-MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE;
