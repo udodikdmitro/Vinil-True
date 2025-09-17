@@ -10,7 +10,8 @@ public class ResourceException extends RuntimeException {
     private Object id;
     private String resourceName;
 
-    public ResourceException() {
+    public ResourceException(String message) {
+        super(message);
     }
 
     public ResourceException(Object id, String resourceName) {

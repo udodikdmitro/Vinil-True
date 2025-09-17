@@ -109,7 +109,7 @@ public class ReviewService {
         if (review.getUser().getEmail().equals(email)) {
             return;
         }
-        if (allowAdminToChange && review.getUser().getRoles().contains(Role.ADMIN)) {
+        if (allowAdminToChange && review.getUser().getRole().compareTo(Role.ADMIN) != 0) {
             return;
         }
         throw new AccessDeniedException("Access Denied");

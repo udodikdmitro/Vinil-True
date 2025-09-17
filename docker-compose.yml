@@ -3,12 +3,12 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15
-    container_name: vinyl-db
+    container_name: vinyltrue-postgres
     restart: always
     environment:
-      POSTGRES_DB: vinylstore
+      POSTGRES_DB: vinyl_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: vinylTrueDataBase2025
     ports:
       - "5432:5432"
     volumes:
@@ -21,11 +21,12 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
+    env_file:
+      - .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/vinylstore
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/vinyl_store_db
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      BREVO_API_KEY: your_brevo_api_key_here
+      SPRING_DATASOURCE_PASSWORD: vinylTrueDataBase2025
 
 volumes:
   pgdata:

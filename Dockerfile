@@ -1,7 +1,10 @@
-FROM eclipse-temurin:21-jdk-alpine
 
-VOLUME /tmp
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
+FROM eclipse-temurin:21-jdk
 
-ENTRYPOINT ["java","-jar","/app.jar"]
+WORKDIR /app
+
+COPY target/Vinil-True-1.0.0.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

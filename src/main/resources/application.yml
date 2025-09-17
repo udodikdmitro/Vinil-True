@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/vinylstore
-    username: your_user
-    password: your_password
+    url: jdbc:postgresql://localhost:5432/vinyl_db
+    username: postgres
+    password: vinylTrueDataBase2025
   flyway:
     enabled: true
   jpa:
@@ -25,3 +25,9 @@ spring:
 api:
   file-metadata:
     endpoint: '/api/v1/files/{id}'
+
+jwt:
+  secret: my-super-secret-key
+
+brevo:
+  api-key: your_real_api_key_here

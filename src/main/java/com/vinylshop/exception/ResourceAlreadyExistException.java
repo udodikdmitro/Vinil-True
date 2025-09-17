@@ -2,7 +2,8 @@ package com.vinylshop.exception;
 
 public class ResourceAlreadyExistException extends ResourceException {
 
-    public ResourceAlreadyExistException() {
+    public ResourceAlreadyExistException(String message) {
+        super(message);
     }
 
     public ResourceAlreadyExistException(Object id, String resourceName) {

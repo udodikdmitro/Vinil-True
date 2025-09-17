@@ -1,18 +1,24 @@
 package com.vinylshop.dto;
 
+import com.vinylshop.entity.Address;
 import com.vinylshop.entity.Role;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 public class UserDto {
     private Long id;
+
     private String email;
+
+    private String passwordHash;
+
     private String fullName;
+
     private Set<Role> roles;
+
 }

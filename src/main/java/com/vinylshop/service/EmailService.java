@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class EmailService {
 
-    @Value("${BREVO_API_KEY}")
+    @Value("${brevo.api-key}")
     private String apiKey;
 
     public void sendEmail(String to, String subject, String content) {

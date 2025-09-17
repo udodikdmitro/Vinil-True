@@ -4,7 +4,7 @@ import com.vinylshop.entity.base.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -24,17 +24,34 @@ public class User extends AuditableEntity<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
-    private String password;
+    private String phoneNumber;
 
+    @Column(nullable = false)
     private String fullName;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", foreignKey = @ForeignKey(name = "fk_user_roles_users_id"))
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    private Role role;
 
+    @Column(nullable = false)
+    private boolean isVerified = false;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @Column(nullable = false)
+    private String passwordHash;
+
+    @Column(nullable = false)
+    private boolean isBlocked;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private Address address;
 }

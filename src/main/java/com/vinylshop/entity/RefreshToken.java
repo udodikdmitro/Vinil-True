@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -28,7 +29,11 @@ public class RefreshToken extends CreatableEntity<Long> {
     @Column(unique = true, nullable = false)
     private String token;
 
+    @Column(nullable = false)
     private Instant expiryDate;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")

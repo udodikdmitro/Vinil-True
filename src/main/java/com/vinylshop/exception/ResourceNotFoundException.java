@@ -2,7 +2,10 @@ package com.vinylshop.exception;
 
 public class ResourceNotFoundException extends ResourceException {
 
+    private static String message;
+
     public ResourceNotFoundException() {
+        super(message);
     }
 
     public ResourceNotFoundException(Object id, String resourceName) {

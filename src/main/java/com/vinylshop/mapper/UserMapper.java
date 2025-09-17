@@ -8,12 +8,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collections;
 import java.util.stream.Stream;
 
 @Mapper
 public interface UserMapper {
 
-    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "role", ignore = true)
     User toEntity(RegisterRequest dto);
 
     UserDto toDto(User entity);
@@ -24,8 +25,8 @@ public interface UserMapper {
 
     default UserDetails toUserDetails(User entity) {
         return org.springframework.security.core.userdetails.User.withUsername(entity.getEmail())
-                .roles(mapRolesToStrings(entity.getRoles()).toArray(String[]::new))
-                .password(entity.getPassword())
+                .roles(mapRolesToStrings(Collections.singleton(entity.getRole())).toArray(String[]::new))
+                .password(entity.getPasswordHash())
                 .build();
     }
 
