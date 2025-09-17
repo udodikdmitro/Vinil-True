@@ -22,9 +22,9 @@ public interface TokenRepository extends JpaRepository<Token, String> {
     /**
      * Видаляє всі токени користувача за userId.
      *
-     * @param personId ID користувача
+     * @param userId ID користувача
      */
-    void deleteByPersonId(String personId);
+    void deleteByUserId(Long userId);
 
     /**
      * Видаляє всі токени, термін дії яких закінчився.

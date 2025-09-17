@@ -1,11 +1,7 @@
 package com.vinylshop.dto;
 
-import com.vinylshop.entity.Address;
 import com.vinylshop.entity.Role;
-import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
